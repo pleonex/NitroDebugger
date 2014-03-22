@@ -83,14 +83,17 @@ namespace NitroDebugger
 			if (packetData[0] != Packet.Prefix[0] || packetData[packetData.Length - 3] != Packet.Suffix[0])
 				throw new FormatException("Invalid packet");
 
+			// Get the original command
 			string command  = packetData.Substring(1, packetData.Length - 4);
+			command = Packet.Unescape(command);
+			command = Packet.DecodeRunLength(command);
+
+			// Compare checksum
 			string checksum = packetData.Substring(packetData.Length - 2, 2); 
-			Packet packet = new Packet(Packet.Unescape(command));
+			Packet packet = new Packet(command);
 
 			if (checksum != packet.CalculateChecksum().ToString("x"))
 				throw new FormatException("Invalid checksum");
-
-			// TODO: Decode run-length data
 
 			return packet;
 		}
@@ -122,6 +125,25 @@ namespace NitroDebugger
 				sb.Replace(EscapeMat[i, 1], EscapeMat[i, 0]);
 
 			return sb.ToString();
+		}
+
+		private static string DecodeRunLength(string data)
+		{
+			int startIdx = data.IndexOf(Packet.RunLengthStart);
+			while (startIdx != -1) {
+				char repeatedChar = data[startIdx - 1];
+				int length = data[startIdx + 1] - 29;
+				if (length < 3)
+					throw new FormatException("Error decoding. Invalid length");
+
+				// Remove RunLengthStart and insert the chars
+				data = data.Remove(startIdx, 1);
+				data = data.Insert(startIdx, new string(repeatedChar, length));
+
+				startIdx = data.IndexOf(Packet.RunLengthStart);
+			}
+
+			return data;
 		}
 	}
 }
