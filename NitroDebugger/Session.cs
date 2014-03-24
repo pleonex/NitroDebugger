@@ -50,6 +50,8 @@ namespace NitroDebugger
 		public void Write(string message)
 		{
 			int count = 0;
+			int response;
+
 			do {
 				if (count == MaxWriteAttemps)
 					throw new Exception("Can not send packet successfully");
@@ -58,18 +60,35 @@ namespace NitroDebugger
 				Packet packet = new Packet(message);
 				byte[] data = packet.GetBinary();
 				this.stream.Write(data, 0, data.Length);
-			} while (this.stream.ReadByte() != Packet.Ack);
+
+				// Check the response is valid
+				response = this.stream.ReadByte();
+				if (response != Packet.Ack && response != Packet.Nack)
+					throw new Exception("Invalid ACK/NACK");
+
+			} while (response != Packet.Ack);
+
+			// Send ACK of the response
+			this.stream.Write(new byte[] {Packet.Ack}, 0, 1);
 		}
 
 		public string Read()
+		{
+			this.UpdateBuffer();
+
+			if (buffer.Length == 0)
+				return string.Empty;
+
+			return Packet.FromBinary(buffer).Command;
+		}
+
+		private void UpdateBuffer()
 		{
 			byte[] data = new byte[1024];
 			while (this.stream.DataAvailable) {
 				int read = this.stream.Read(data, 0, data.Length);
 				buffer.AppendFormat("{0}", Encoding.ASCII.GetString(data, 0, read));
 			}
-
-			return Packet.FromBinary(buffer).Command;
 		}
 	}
 }
