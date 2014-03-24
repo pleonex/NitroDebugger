@@ -61,25 +61,30 @@ namespace NitroDebugger
 				byte[] data = packet.GetBinary();
 				this.stream.Write(data, 0, data.Length);
 
+				// Get the response
+				do
+					response = this.stream.ReadByte();
+				while (response == -1);
+
 				// Check the response is valid
-				response = this.stream.ReadByte();
 				if (response != Packet.Ack && response != Packet.Nack)
 					throw new Exception("Invalid ACK/NACK");
 
 			} while (response != Packet.Ack);
-
-			// Send ACK of the response
-			this.stream.Write(new byte[] {Packet.Ack}, 0, 1);
 		}
 
 		public string Read()
 		{
-			this.UpdateBuffer();
+			do
+				this.UpdateBuffer();
+			while (buffer.Length == 0);
 
-			if (buffer.Length == 0)
-				return string.Empty;
+			string response = Packet.FromBinary(buffer).Command;
 
-			return Packet.FromBinary(buffer).Command;
+			// Send ACK of the response
+			this.stream.WriteByte(Packet.Ack);
+
+			return response;
 		}
 
 		private void UpdateBuffer()
