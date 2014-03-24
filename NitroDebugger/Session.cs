@@ -19,8 +19,8 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace NitroDebugger
 {
@@ -29,14 +29,15 @@ namespace NitroDebugger
 	/// </summary>
 	public class Session
 	{
-		private UdpClient client;
-		private IPEndPoint endPoint;
+		private TcpClient client;
+		private NetworkStream stream;
+		private StringBuilder buffer;
 
-		public Session(string address, int port)
+		public Session(string hostname, int port)
 		{
-			this.client = new UdpClient();
-			this.endPoint = new IPEndPoint(IPAddress.Parse(address), port);
-			this.client.Connect(endPoint);
+			this.client = new TcpClient(hostname, port);
+			this.stream = this.client.GetStream();
+			this.buffer = new StringBuilder();
 		}
 
 		public void Close()
@@ -44,18 +45,24 @@ namespace NitroDebugger
 			this.client.Close();
 		}
 
-		public void Write(string message)
+		public bool Write(string message)
 		{
 			Packet packet = new Packet(message);
 			byte[] data = packet.GetBinary();
-			this.client.Send(data, data.Length);
+			this.stream.Write(data, 0, data.Length);
+
+			return this.stream.ReadByte() == Packet.Ack;
 		}
 
 		public string Read()
 		{
-			IPEndPoint origin = new IPEndPoint(IPAddress.Any, 0);
-			byte[] data = this.client.Receive(ref origin);
-			return Packet.FromBinary(data).Command;
+			byte[] data = new byte[1024];
+			while (this.stream.DataAvailable) {
+				int read = this.stream.Read(data, 0, data.Length);
+				buffer.AppendFormat("{0}", Encoding.ASCII.GetString(data, 0, read));
+			}
+
+			return Packet.FromBinary(buffer).Command;
 		}
 	}
 }

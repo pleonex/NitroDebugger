@@ -41,15 +41,15 @@ namespace NitroDebugger
 			this.Command = command;
 		}
 
-		public static byte[] Ack {
+		public static byte Ack {
 			get {
-				return Encoding.GetBytes("+");
+				return 0x2B;	// '+'
 			}
 		}
 
-		public static byte[] Nack {
+		public static byte Nack {
 			get {
-				return Encoding.GetBytes("-");
+				return 0x2D;	// '-'
 			}
 		}
 
@@ -68,20 +68,37 @@ namespace NitroDebugger
 			binPacket.Append(Packet.Prefix);
 			binPacket.Append(Packet.Escape(this.Command));
 			binPacket.Append(Packet.Suffix);
-			binPacket.Append(this.CalculateChecksum());
+			binPacket.Append(this.CalculateChecksum().ToString("x"));
 
 			return Encoding.GetBytes(binPacket.ToString());
 		}
 
-		public static Packet FromBinary(byte[] binPacket)
+		public static Packet FromBinary(System.Text.StringBuilder dataReceived)
 		{
-			String packetData = Encoding.GetString(binPacket);
-
-			if (packetData.Length < 4)
+			// Check if there is enough data
+			if (dataReceived.Length < 4)
 				throw new FormatException("Too small packet");
 
-			if (packetData[0] != Packet.Prefix[0] || packetData[packetData.Length - 3] != Packet.Suffix[0])
+			// Check the prefix
+			if (dataReceived[0] != Packet.Prefix[0])
 				throw new FormatException("Invalid packet");
+
+			// Get the packet length
+			int packetLength = 0;
+			for (int i = 0; i < dataReceived.Length && packetLength == 0; i++) {
+				if (dataReceived[i] == Packet.Suffix[0])
+					packetLength = i + 3;
+			}
+
+			// Check if there is enough data
+			if (packetLength == 0 || packetLength > dataReceived.Length)
+				throw new FormatException("Not enough data received");
+
+			// Get the packet and remove from the stringbuilder
+			char[] charData = new char[packetLength];
+			dataReceived.CopyTo(0, charData, 0, packetLength);
+			string packetData = new string(charData);
+			dataReceived.Remove(0, packetLength);
 
 			// Get the original command
 			string command  = packetData.Substring(1, packetData.Length - 4);
