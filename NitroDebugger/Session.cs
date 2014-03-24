@@ -29,6 +29,8 @@ namespace NitroDebugger
 	/// </summary>
 	public class Session
 	{
+		private const int MaxWriteAttemps = 10;
+
 		private TcpClient client;
 		private NetworkStream stream;
 		private StringBuilder buffer;
@@ -45,13 +47,18 @@ namespace NitroDebugger
 			this.client.Close();
 		}
 
-		public bool Write(string message)
+		public void Write(string message)
 		{
-			Packet packet = new Packet(message);
-			byte[] data = packet.GetBinary();
-			this.stream.Write(data, 0, data.Length);
+			int count = 0;
+			do {
+				if (count == MaxWriteAttemps)
+					throw new Exception("Can not send packet successfully");
+				count++;
 
-			return this.stream.ReadByte() == Packet.Ack;
+				Packet packet = new Packet(message);
+				byte[] data = packet.GetBinary();
+				this.stream.Write(data, 0, data.Length);
+			} while (this.stream.ReadByte() != Packet.Ack);
 		}
 
 		public string Read()
