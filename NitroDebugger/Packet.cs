@@ -109,7 +109,7 @@ namespace NitroDebugger
 			string checksum = packetData.Substring(packetData.Length - 2, 2); 
 			Packet packet = new Packet(command);
 
-			if (checksum != packet.CalculateChecksum().ToString("x"))
+			if (checksum != packet.CalculateChecksum().ToString("x").PadLeft(2, '0'))
 				throw new FormatException("Invalid checksum");
 
 			return packet;
