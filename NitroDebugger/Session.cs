@@ -47,6 +47,12 @@ namespace NitroDebugger
 			this.client.Close();
 		}
 
+		public string Break()
+		{
+			this.stream.WriteByte(0x03);
+			return this.Read();
+		}
+
 		public void Write(string message)
 		{
 			int count = 0;
