@@ -40,7 +40,6 @@
     <Compile Include="RSP\Session.cs" />
     <Compile Include="GdbClient.cs" />
     <Compile Include="RSP\TargetSignals.cs" />
-    <Compile Include="RSP\TcpClientAdapter.cs" />
     <Compile Include="RSP\Presentation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

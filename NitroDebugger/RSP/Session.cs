@@ -31,17 +31,17 @@ namespace NitroDebugger.RSP
 	/// </summary>
 	public class Session
 	{
-		private ITcpClient client;
-		private Stream stream;
+		private TcpClient client;
+		private NetworkStream stream;
 
 		public Session(string hostname, int port)
 		{
-			this.client = new TcpClientAdapter(hostname, port);
+			this.client = new TcpClient(hostname, port);
 			this.stream = this.client.GetStream();
 		}
 
 		public bool DataAvailable {
-			get { return this.client.DataAvailable(); }
+			get { return this.stream.DataAvailable; }
 		}
 
 		public void Close()
