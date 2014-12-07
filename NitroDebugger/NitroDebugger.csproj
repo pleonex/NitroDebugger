@@ -36,10 +36,13 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Packet.cs" />
-    <Compile Include="Session.cs" />
+    <Compile Include="RSP\Packet.cs" />
+    <Compile Include="RSP\Session.cs" />
     <Compile Include="GdbClient.cs" />
-    <Compile Include="TargetSignals.cs" />
+    <Compile Include="RSP\TargetSignals.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="RSP\" />
+  </ItemGroup>
 </Project>

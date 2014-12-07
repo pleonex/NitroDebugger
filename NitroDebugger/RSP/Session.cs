@@ -25,7 +25,7 @@ using System.Text;
 namespace NitroDebugger
 {
 	/// <summary>
-	/// Represents the presentation layer.
+	/// Represents the session layer.
 	/// </summary>
 	public class Session
 	{
