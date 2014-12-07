@@ -23,23 +23,46 @@ using System;
 using NitroDebugger.RSP;
 using System.Net.Sockets;
 using System.Net;
+using System.Runtime.Serialization.Formatters;
 
 namespace UnitTests
 {
-	[TestFixture()]
-	public class Test
+	[TestFixture]
+	public class SessionTests
 	{
 		private const int DefaultPort = 10101;
+		private TcpListener server;
 
-		[Test()]
+		[TestFixtureSetUp]
+		public void CreateServer()
+		{
+			server = new TcpListener(IPAddress.Loopback, DefaultPort);
+			server.Start();
+		}
+
+		[TestFixtureTearDown]
+		public void StopServer()
+		{
+			server.Stop();
+		}
+
+		[TearDown]
+		public void ResetServer()
+		{
+			while (server.Pending())
+				server.AcceptTcpClient().Close();
+		}
+
+		[Test]
 		public void ConnectLocalhostDefaultPort()
 		{
-			TcpListener server = new TcpListener(IPAddress.Loopback, DefaultPort);
-			server.Start();
-
 			Assert.DoesNotThrow(() => new Session("localhost", DefaultPort));
+		}
 
-			server.Stop();
+		[Test]
+		public void ConnectCloseLocalhostDefaultPort()
+		{
+			Assert.DoesNotThrow(() => new Session("localhost", DefaultPort).Close());
 		}
 	}
 }
