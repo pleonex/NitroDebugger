@@ -30,10 +30,10 @@ namespace NitroDebugger
 		private const string RunLengthStart = "*";
 		private const string EscapeChar = "}";
 		private static string[,] EscapeMat = {
-			{ Suffix,         EscapeChar + (Suffix[0]         ^ 0x20) },
-			{ Prefix,         EscapeChar + (Prefix[0]         ^ 0x20) },
-			{ EscapeChar,     EscapeChar + (EscapeChar[0]     ^ 0x20) },
-			{ RunLengthStart, EscapeChar + (RunLengthStart[0] ^ 0x20) }	// Only in response from stub
+			{ Suffix,         EscapeChar + (char)(Suffix[0]         ^ 0x20) },
+			{ Prefix,         EscapeChar + (char)(Prefix[0]         ^ 0x20) },
+			{ EscapeChar,     EscapeChar + (char)(EscapeChar[0]     ^ 0x20) },
+			{ RunLengthStart, EscapeChar + (char)(RunLengthStart[0] ^ 0x20) }	// Only in response from stub
 		};
 
 		public Packet(string command)
@@ -86,7 +86,7 @@ namespace NitroDebugger
 			// Get the packet length
 			int packetLength = 0;
 			for (int i = 0; i < dataReceived.Length && packetLength == 0; i++) {
-				if (dataReceived[i] == Packet.Suffix[0])
+				if (dataReceived[i] == Packet.Suffix[0] && (i > 0 && dataReceived[i - 1] != Packet.EscapeChar[0]))
 					packetLength = i + 3;
 			}
 
