@@ -58,6 +58,8 @@ namespace NitroDebugger.RSP
 		}
 
 		protected abstract string PackArguments();
+
+		public abstract ResponseType Response();
 	}
 }
 
