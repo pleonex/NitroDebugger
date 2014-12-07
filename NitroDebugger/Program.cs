@@ -65,6 +65,25 @@ namespace NitroDebugger
 					Console.WriteLine(client.GetHaltedReason());
 					break;
 
+				case "sp!":
+				case "stop!":
+					Console.WriteLine(client.Stop());
+					break;
+
+				case "c!":
+				case "cont!":
+					client.Continue();
+					break;
+
+				case "nx!":
+				case "next!":
+					Console.WriteLine(client.NextStep());
+					break;
+
+				case "a":
+					Console.WriteLine(client.Test());
+					break;
+
 				default:
 					Console.WriteLine("Unknown command");
 					break;

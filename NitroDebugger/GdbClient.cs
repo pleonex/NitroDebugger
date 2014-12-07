@@ -44,7 +44,35 @@ namespace NitroDebugger
 		{
 			session.Write("?");
 			string response = session.Read();
+			return this.ParseStopResponse(response);
+		}
 
+		public StopType Stop()
+		{
+			string response = this.session.Break();
+			return this.ParseStopResponse(response);
+		}
+
+		public void Continue()
+		{
+			this.session.Write("c");
+		}
+
+		public string Test()
+		{
+			this.session.Write("n2000800,4");
+			return this.session.Read();
+		}
+
+		public StopType NextStep()
+		{
+			this.session.Write("s");
+			string response = session.Read();
+			return this.ParseStopResponse(response);
+		}
+
+		private StopType ParseStopResponse(string response)
+		{
 			if (response.Length == 3 && response[0] == 'S') {
 				int signal = Convert.ToInt32(response.Substring(1, 2));
 				return this.SignalToStop((TargetSignals)signal);
