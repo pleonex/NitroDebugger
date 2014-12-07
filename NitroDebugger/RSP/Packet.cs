@@ -28,13 +28,6 @@ namespace NitroDebugger.RSP
 		public Packet(string command)
 		{
 			this.Command = command;
-			this.Arguments = new string[0];
-		}
-
-		public Packet(string command, string[] args)
-		{
-			this.Command = command;
-			this.Arguments = args;
 		}
 
 		public static byte Ack {
@@ -60,10 +53,11 @@ namespace NitroDebugger.RSP
 			private set;
 		}
 
-		public string[] Arguments {
-			get;
-			private set;
+		public string Pack() {
+			return this.Command + this.PackArguments();
 		}
+
+		protected abstract string PackArguments();
 	}
 }
 

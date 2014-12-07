@@ -29,88 +29,20 @@ namespace NitroDebugger.RSP
 
 		private const string Prefix = "$";
 		private const string Suffix = "#";
-		private const string RunLengthStart = "*";
-		private const string EscapeChar = "}";
-		private static string[,] EscapeMat = {
-			{ Suffix,         EscapeChar + (char)(Suffix[0]         ^ 0x20) },
-			{ Prefix,         EscapeChar + (char)(Prefix[0]         ^ 0x20) },
-			{ EscapeChar,     EscapeChar + (char)(EscapeChar[0]     ^ 0x20) },
-			{ RunLengthStart, EscapeChar + (char)(RunLengthStart[0] ^ 0x20) }	// Only in response from stub
-		};
 
-		public static byte[] GetBinary(Packet packet)
+		public static byte[] ToBinary(Packet packet)
 		{
-			byte[] data = TextEncoding.GetBytes(packet.Command);
+			string dataText = packet.Pack();
+			byte[] dataBin = TextEncoding.GetBytes(dataText);
 
 			StringBuilder binPacket = new StringBuilder();
 			binPacket.Append(PacketBinConverter.Prefix);
-			binPacket.Append(Escape(packet.Command));
+			binPacket.Append(dataText);
 			binPacket.Append(PacketBinConverter.Suffix);
-			binPacket.Append(Checksum.Calculate(data).ToString("x"));
+			binPacket.Append(Checksum.Calculate(dataBin).ToString("x2"));
 
 			return TextEncoding.GetBytes(binPacket.ToString());
 		}
-//
-//		public static Packet FromBinary(StringBuilder dataReceived)
-//		{
-//			// Check if there is enough data
-//			if (dataReceived.Length < 4)
-//				throw new FormatException("Too small packet");
-//
-//			// Check the prefix
-//			if (dataReceived[0] != Packet.Prefix[0])
-//				throw new FormatException("Invalid packet");
-//
-//			// Get the packet length
-//			int packetLength = 0;
-//			for (int i = 0; i < dataReceived.Length && packetLength == 0; i++) {
-//				if (dataReceived[i] == Packet.Suffix[0] &&
-//					(i > 0 && dataReceived[i - 1] != Packet.EscapeChar[0]))
-//					packetLength = i + 3;
-//			}
-//
-//			// Check if there is enough data
-//			if (packetLength == 0 || packetLength > dataReceived.Length)
-//				throw new FormatException("Not enough data received");
-//
-//			// Get the packet and remove from the stringbuilder
-//			char[] charData = new char[packetLength];
-//			dataReceived.CopyTo(0, charData, 0, packetLength);
-//			string packetData = new string(charData);
-//			dataReceived.Remove(0, packetLength);
-//
-//			// Get the original command
-//			string command  = packetData.Substring(1, packetData.Length - 4);
-//			command = Packet.Unescape(command);
-//			command = Packet.DecodeRunLength(command);
-//
-//			// Compare checksum
-//			string checksum = packetData.Substring(packetData.Length - 2, 2); 
-//			Packet packet = new Packet(command);
-//
-//			if (checksum != packet.CalculateChecksum().ToString("x").PadLeft(2, '0'))
-//				throw new FormatException("Invalid checksum");
-//
-//			return packet;
-//		}
-//
-		private static string Escape(string command)
-		{
-			StringBuilder sb = new StringBuilder(command);
-			for (int i = 0; i < 3; i++)
-				sb.Replace(EscapeMat[i, 0], EscapeMat[i, 1]);
-
-			return sb.ToString();
-		}
-
-//		private static string Unescape(string command)
-//		{
-//			StringBuilder sb = new StringBuilder(command);
-//			for (int i = 0; i < 4; i++)
-//				sb.Replace(EscapeMat[i, 1], EscapeMat[i, 0]);
-//
-//			return sb.ToString();
-//		}
 	}
 }
 

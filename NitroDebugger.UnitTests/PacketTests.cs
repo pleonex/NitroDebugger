@@ -19,9 +19,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using Moq;
+using Moq.Protected;
 using NUnit.Framework;
 using NitroDebugger.RSP;
 using NitroDebugger;
+using System.Text;
 
 namespace UnitTests
 {
@@ -109,25 +112,35 @@ namespace UnitTests
 			TestChecksum(0x11, new byte[] { 0x80, 0x41, 0x3F, 0x10, 0x01 });
 		}
 
+		private void TestPacketToBin(string cmd, string args, string crc)
+		{
+			string expected = "$" + cmd + args + "#" + crc;
+
+			Mock<Packet> packet = new Mock<Packet>(cmd);
+			packet.Protected().Setup<String>("PackArguments").Returns(args);
+
+			byte[] binary = PacketBinConverter.ToBinary(packet.Object);
+			string actual = Encoding.ASCII.GetString(binary);
+
+			Assert.AreEqual(expected, actual);
+		}
+
 		[Test]
 		public void EmptyPacketToBin()
 		{
-			string expected = "$#00";
-			string data = "";
-			//string actual = PacketBinConverter.ToBin(data);
-			//Assert.AreEqual(expected, actual);
+			TestPacketToBin("", "", "00");
 		}
 
 		[Test]
 		public void NoArgsPacketToBin()
 		{
-			Assert.Fail();
+			TestPacketToBin("c", "", "63");
 		}
 
 		[Test]
 		public void ArgsPacketToBin()
 		{
-			Assert.Fail();
+			TestPacketToBin("m", "02000800,0100", "e4");
 		}
 	}
 }
