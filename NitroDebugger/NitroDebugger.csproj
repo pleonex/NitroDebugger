@@ -42,4 +42,7 @@
     <Compile Include="TargetSignals.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="RSP\" />
+  </ItemGroup>
 </Project>
