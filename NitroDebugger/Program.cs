@@ -54,8 +54,14 @@ namespace NitroDebugger
 				switch (cmd) {
 				case "gotobed":
 					Console.WriteLine("Ok, time to sleep.");
+					finish = true;
+					break;
+
 				case "gotouni":
 					Console.WriteLine("You are late again...");
+					finish = true;
+					break;
+
 				case "exit":
 					finish = true;
 					break;
