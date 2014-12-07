@@ -41,6 +41,9 @@
     <Compile Include="GdbClient.cs" />
     <Compile Include="RSP\TargetSignals.cs" />
     <Compile Include="RSP\Presentation.cs" />
+    <Compile Include="RSP\PacketBinConverter.cs" />
+    <Compile Include="RSP\Rle.cs" />
+    <Compile Include="RSP\Checksum.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
