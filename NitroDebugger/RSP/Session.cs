@@ -19,10 +19,11 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 
-namespace NitroDebugger
+namespace NitroDebugger.RSP
 {
 	/// <summary>
 	/// Represents the session layer.
@@ -31,13 +32,13 @@ namespace NitroDebugger
 	{
 		private const int MaxWriteAttemps = 10;
 
-		private TcpClient client;
-		private NetworkStream stream;
+		private ITcpClient client;
+		private Stream stream;
 		private StringBuilder buffer;
 
 		public Session(string hostname, int port)
 		{
-			this.client = new TcpClient(hostname, port);
+			this.client = new TcpClientAdapter(hostname, port);
 			this.stream = this.client.GetStream();
 			this.buffer = new StringBuilder();
 		}
@@ -106,7 +107,7 @@ namespace NitroDebugger
 		private void UpdateBuffer()
 		{
 			byte[] data = new byte[1024];
-			while (this.stream.DataAvailable) {
+			while (this.client.DataAvailable()) {
 				int read = this.stream.Read(data, 0, data.Length);
 				buffer.AppendFormat("{0}", Encoding.ASCII.GetString(data, 0, read));
 			}

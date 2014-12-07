@@ -1,5 +1,5 @@
 ﻿//
-//  Test.cs
+//  TcpClientAdapter.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -18,28 +18,45 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using NUnit.Framework;
 using System;
-using NitroDebugger.RSP;
+using System.IO;
 using System.Net.Sockets;
-using System.Net;
 
-namespace UnitTests
+namespace NitroDebugger.RSP
 {
-	[TestFixture()]
-	public class Test
+	public interface ITcpClient {
+		Stream GetStream();
+		void Close();
+		bool DataAvailable();
+	}
+
+	public class TcpClientAdapter : ITcpClient
 	{
-		private const int DefaultPort = 10101;
+		private TcpClient wrappedClient;
 
-		[Test()]
-		public void ConnectLocalhostDefaultPort()
+		public TcpClientAdapter(TcpClient client)
 		{
-			TcpListener server = new TcpListener(IPAddress.Loopback, DefaultPort);
-			server.Start();
+			this.wrappedClient = client;
+		}
 
-			Assert.DoesNotThrow(() => new Session("localhost", DefaultPort));
+		public TcpClientAdapter(string hostname, int port)
+		{
+			this.wrappedClient = new TcpClient(hostname, port);
+		}
 
-			server.Stop();
+		public Stream GetStream()
+		{
+			return wrappedClient.GetStream();
+		}
+
+		public void Close()
+		{
+			wrappedClient.Close();
+		}
+
+		public bool DataAvailable()
+		{
+			return wrappedClient.GetStream().DataAvailable;
 		}
 	}
 }
