@@ -19,7 +19,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace NitroDebugger.RSP
 {
@@ -42,6 +44,38 @@ namespace NitroDebugger.RSP
 			binPacket.Append(Checksum.Calculate(dataBin).ToString("x2"));
 
 			return TextEncoding.GetBytes(binPacket.ToString());
+		}
+
+		public static Packet FromBinary(byte[] data)
+		{
+			if (!ValidateBinary(data))
+				throw new FormatException("[BIN] Invalid packet");
+				
+			string packet = TextEncoding.GetString(data);
+			string packetData = packet.Substring(1, packet.Length - 4);
+			packetData = Rle.Decode(packetData);
+
+			// Compare checksum
+			string receivedChecksum = packet.Substring(packet.Length - 2, 2);
+			uint calculatedChecksum = Checksum.Calculate(packetData);
+			if (receivedChecksum != calculatedChecksum.ToString("x2"))
+				throw new FormatException("[BIN] Invalid checksum");
+
+			return null;
+		}
+
+		private static bool ValidateBinary(byte[] data)
+		{
+			if (data.Length < 4)
+				return false;
+				
+			if (data[0] != Prefix[0])
+				return false;
+
+			if (data[data.Length - 3] != Suffix[0])
+				return false;
+
+			return true;
 		}
 	}
 }

@@ -95,6 +95,14 @@ namespace UnitTests
 		}
 
 		[Test]
+		public void ChecksumEmptyString()
+		{
+			uint expected = 0;
+			uint actual = Checksum.Calculate("");
+			Assert.AreEqual(expected, actual);
+		}
+
+		[Test]
 		public void ChecksumWithDataLower256()
 		{
 			TestChecksum(0x81, new byte[] { 0x40, 0x01, 0x40 });
@@ -110,6 +118,14 @@ namespace UnitTests
 		public void ChecksumWithDataGreater256()
 		{
 			TestChecksum(0x11, new byte[] { 0x80, 0x41, 0x3F, 0x10, 0x01 });
+		}
+
+		[Test]
+		public void ChecksumWithDataGreater256String()
+		{
+			uint expected = 0xe4;
+			uint actual = Checksum.Calculate("m02000800,0100");
+			Assert.AreEqual(expected, actual);
 		}
 
 		private void TestPacketToBin(string cmd, string args, string crc)
@@ -141,6 +157,37 @@ namespace UnitTests
 		public void ArgsPacketToBin()
 		{
 			TestPacketToBin("m", "02000800,0100", "e4");
+		}
+
+		[Test]
+		public void FromBinSmallPacket()
+		{
+			byte[] data = new byte[] { 0xFF, 0xFF };
+			Assert.Throws<FormatException>(() => PacketBinConverter.FromBinary(data));
+		}
+
+		[Test]
+		public void FromBinNoPrefix()
+		{
+			//							m     c     #     0     0
+			byte[] data = new byte[] { 0x6D, 0x63, 0x23, 0x30, 0x30 };
+			Assert.Throws<FormatException>(() => PacketBinConverter.FromBinary(data));
+		}
+
+		[Test]
+		public void FromBinNoSuffix()
+		{
+			//						    $     c     0     0 
+			byte[] data = new byte[] { 0x24, 0x63, 0x30, 0x30 };
+			Assert.Throws<FormatException>(() => PacketBinConverter.FromBinary(data));
+		}
+
+		[Test]
+		public void FromBinInvalidChecksum()
+		{
+			//							$     c     #     0     0
+			byte[] data = new byte[] { 0x24, 0x63, 0x23, 0x30, 0x30 };
+			Assert.Throws<FormatException>(() => PacketBinConverter.FromBinary(data));
 		}
 	}
 }

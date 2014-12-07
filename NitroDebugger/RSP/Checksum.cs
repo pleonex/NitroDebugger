@@ -19,11 +19,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Text;
 
 namespace NitroDebugger
 {
 	public static class Checksum
 	{
+		public static uint Calculate(string data)
+		{
+			return Calculate(Encoding.ASCII.GetBytes(data));
+		}
+
 		public static uint Calculate(byte[] data)
 		{
 			uint sum = 0;
