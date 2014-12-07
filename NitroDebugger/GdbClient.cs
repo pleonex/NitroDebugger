@@ -28,46 +28,46 @@ namespace NitroDebugger.RSP
 	/// </summary>
 	public class GdbClient
 	{
-		private Session session;
+		private Presentation presentation;
 
 		public GdbClient(string hostname, int port)
 		{
-			this.session = new Session(hostname, port);
+			this.presentation = new Presentation(hostname, port);
 		}
 
 		public void Close()
 		{
-			this.session.Close();
+			this.presentation.Close();
 		}
 
 		public StopType GetHaltedReason()
 		{
-			session.Write("?");
-			string response = session.Read();
+			presentation.Write("?");
+			string response = presentation.Read();
 			return this.ParseStopResponse(response);
 		}
 
 		public StopType Stop()
 		{
-			string response = this.session.Break();
+			string response = this.presentation.Break();
 			return this.ParseStopResponse(response);
 		}
 
 		public void Continue()
 		{
-			this.session.Write("c");
+			this.presentation.Write("c");
 		}
 
 		public string Test()
 		{
-			this.session.Write("n2000800,4");
-			return this.session.Read();
+			this.presentation.Write("n2000800,4");
+			return this.presentation.Read();
 		}
 
 		public StopType NextStep()
 		{
-			this.session.Write("s");
-			string response = session.Read();
+			this.presentation.Write("s");
+			string response = presentation.Read();
 			return this.ParseStopResponse(response);
 		}
 

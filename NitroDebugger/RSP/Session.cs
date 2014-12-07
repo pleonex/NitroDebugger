@@ -19,6 +19,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -30,17 +31,17 @@ namespace NitroDebugger.RSP
 	/// </summary>
 	public class Session
 	{
-		private const int MaxWriteAttemps = 10;
-
 		private ITcpClient client;
 		private Stream stream;
-		private StringBuilder buffer;
 
 		public Session(string hostname, int port)
 		{
 			this.client = new TcpClientAdapter(hostname, port);
 			this.stream = this.client.GetStream();
-			this.buffer = new StringBuilder();
+		}
+
+		public bool DataAvailable {
+			get { return this.client.DataAvailable(); }
 		}
 
 		public void Close()
@@ -48,69 +49,37 @@ namespace NitroDebugger.RSP
 			this.client.Close();
 		}
 
-		public string Break()
+		public void Write(byte data)
 		{
-			this.stream.WriteByte(0x03);
-			return this.Read();
+			this.stream.WriteByte(data);
 		}
 
-		public void Write(string message)
+		public void Write(byte[] data)
 		{
-			int count = 0;
-			int response;
-
-			do {
-				if (count == MaxWriteAttemps)
-					throw new Exception("Can not send packet successfully");
-				count++;
-
-				Packet packet = new Packet(message);
-				byte[] data = packet.GetBinary();
-				this.stream.Write(data, 0, data.Length);
-
-				// Get the response
-				do
-					response = this.stream.ReadByte();
-				while (response == -1);
-
-				// Check the response is valid
-				if (response != Packet.Ack && response != Packet.Nack)
-					throw new Exception("Invalid ACK/NACK");
-
-			} while (response != Packet.Ack);
+			this.stream.Write(data, 0, data.Length);
 		}
 
-		public string Read()
+		public byte ReadByte()
 		{
-			do
-				this.UpdateBuffer();
-			while (buffer.Length == 0);
+			int result = this.stream.ReadByte();
+			if (result == -1)
+				throw new EndOfStreamException("No more data to read!");
 
-			string command = null;
+			return (byte)result;
+		}
 
-			try {
-				// Get packet
-				Packet response = Packet.FromBinary(buffer);
-				command = response.Command;
+		public byte[] ReadBytes()
+		{
+			List<byte> received = new List<byte>();
 
-				// Send ACK
-				this.stream.WriteByte(Packet.Ack);
-			} catch (FormatException ex) {
-				// Error... send NACK
-				this.stream.WriteByte(Packet.Nack);
+			byte[] buffer = new byte[1024];
+			while (this.DataAvailable) {
+				int read = this.stream.Read(buffer, 0, buffer.Length);
+				Array.Resize<byte>(ref buffer, read);
+				received.AddRange(buffer);
 			}
 
-
-			return command;
-		}
-
-		private void UpdateBuffer()
-		{
-			byte[] data = new byte[1024];
-			while (this.client.DataAvailable()) {
-				int read = this.stream.Read(data, 0, data.Length);
-				buffer.AppendFormat("{0}", Encoding.ASCII.GetString(data, 0, read));
-			}
+			return received.ToArray();
 		}
 	}
 }
