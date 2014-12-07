@@ -85,12 +85,22 @@ namespace NitroDebugger
 				this.UpdateBuffer();
 			while (buffer.Length == 0);
 
-			string response = Packet.FromBinary(buffer).Command;
+			string command = null;
 
-			// Send ACK of the response
-			this.stream.WriteByte(Packet.Ack);
+			try {
+				// Get packet
+				Packet response = Packet.FromBinary(buffer);
+				command = response.Command;
 
-			return response;
+				// Send ACK
+				this.stream.WriteByte(Packet.Ack);
+			} catch (FormatException ex) {
+				// Error... send NACK
+				this.stream.WriteByte(Packet.Nack);
+			}
+
+
+			return command;
 		}
 
 		private void UpdateBuffer()

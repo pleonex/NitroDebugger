@@ -16,5 +16,9 @@ Global
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = NitroDebugger\NitroDebugger.csproj
+		Policies = $0
+		$0.ChangeLogPolicy = $1
+		$1.UpdateMode = None
+		$1.inheritsSet = Mono
 	EndGlobalSection
 EndGlobal
