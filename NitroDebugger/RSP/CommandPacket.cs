@@ -23,29 +23,11 @@ using System.Text;
 
 namespace NitroDebugger.RSP
 {
-	public abstract class Packet
+	public abstract class CommandPacket
 	{
-		public Packet(string command)
+		public CommandPacket(string command)
 		{
 			this.Command = command;
-		}
-
-		public static byte Ack {
-			get {
-				return 0x2B;	// '+'
-			}
-		}
-
-		public static byte Nack {
-			get {
-				return 0x2D;	// '-'
-			}
-		}
-
-		public static byte Interrupt {
-			get {
-				return 0x03;
-			}
 		}
 
 		public string Command {
@@ -58,8 +40,6 @@ namespace NitroDebugger.RSP
 		}
 
 		protected abstract string PackArguments();
-
-		public abstract ResponseType Response();
 	}
 }
 

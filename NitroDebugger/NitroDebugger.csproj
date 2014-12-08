@@ -36,7 +36,6 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RSP\Packet.cs" />
     <Compile Include="RSP\Session.cs" />
     <Compile Include="GdbClient.cs" />
     <Compile Include="RSP\TargetSignals.cs" />
@@ -44,7 +43,10 @@
     <Compile Include="RSP\PacketBinConverter.cs" />
     <Compile Include="RSP\Rle.cs" />
     <Compile Include="RSP\Checksum.cs" />
-    <Compile Include="RSP\ResponseType.cs" />
+    <Compile Include="RSP\RawPacket.cs" />
+    <Compile Include="RSP\CommandPacket.cs" />
+    <Compile Include="RSP\ReplyPacket.cs" />
+    <Compile Include="RSP\ReplyPacketFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -1,5 +1,5 @@
 ﻿//
-//  ResponseType.cs
+//  ReplyPacketFactory.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -22,11 +22,12 @@ using System;
 
 namespace NitroDebugger
 {
-	public enum ResponseType
+	public static class ReplyPacketFactory
 	{
-		NoReply,
-		SimpleReply,
-		DataReply
+		public static ReplyPacket CreateReplyPacket(string data)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
 

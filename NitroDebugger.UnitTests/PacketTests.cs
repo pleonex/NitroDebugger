@@ -132,7 +132,7 @@ namespace UnitTests
 		{
 			string expected = "$" + cmd + args + "#" + crc;
 
-			Mock<Packet> packet = new Mock<Packet>(cmd);
+			Mock<CommandPacket> packet = new Mock<CommandPacket>(cmd);
 			packet.Protected().Setup<String>("PackArguments").Returns(args);
 
 			byte[] binary = PacketBinConverter.ToBinary(packet.Object);
@@ -188,6 +188,14 @@ namespace UnitTests
 			//							$     c     #     0     0
 			byte[] data = new byte[] { 0x24, 0x63, 0x23, 0x30, 0x30 };
 			Assert.Throws<FormatException>(() => PacketBinConverter.FromBinary(data));
+		}
+
+		[Test]
+		public void FromBinReplyPacket()
+		{
+			//							$     O     K     #     9     c
+			byte[] data = new byte[] { 0x24, 0x51, 0x4B, 0x23, 0x39, 0x63 };
+			ReplyPacket actual = PacketBinConverter.FromBinary(data);
 		}
 	}
 }

@@ -32,7 +32,7 @@ namespace NitroDebugger.RSP
 		private const string Prefix = "$";
 		private const string Suffix = "#";
 
-		public static byte[] ToBinary(Packet packet)
+		public static byte[] ToBinary(CommandPacket packet)
 		{
 			string dataText = packet.Pack();
 			byte[] dataBin = TextEncoding.GetBytes(dataText);
@@ -46,7 +46,7 @@ namespace NitroDebugger.RSP
 			return TextEncoding.GetBytes(binPacket.ToString());
 		}
 
-		public static Packet FromBinary(byte[] data)
+		public static ReplyPacket FromBinary(byte[] data)
 		{
 			if (!ValidateBinary(data))
 				throw new FormatException("[BIN] Invalid packet");
@@ -61,7 +61,7 @@ namespace NitroDebugger.RSP
 			if (receivedChecksum != calculatedChecksum.ToString("x2"))
 				throw new FormatException("[BIN] Invalid checksum");
 
-			return null;
+			return ReplyPacketFactory.CreateReplyPacket(packetData);
 		}
 
 		private static bool ValidateBinary(byte[] data)
