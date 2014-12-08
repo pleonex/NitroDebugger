@@ -5,6 +5,7 @@ install:
   - sudo apt-get install mono-devel mono-gmcs nunit-console
   - wget http://nuget.org/nuget.exe -O ./.nuget/NuGet.exe
   - chmod a+x ./.nuget/NuGet.exe
+  - mozroots --import --sync
 script:
   - xbuild NitroDebugger.sln
   - nunit-console NitroDebugger.UnitTests/bin/Debug/NitroDebugger.UnitTests.dll

@@ -1,4 +1,6 @@
 **NitroDebugger** is a remote debugger for Nintendo DS games.
+[![Build Status](https://travis-ci.org/pleonex/NitroDebugger.svg?branch=master)](https://travis-ci.org/pleonex/NitroDebugger)
+
 By using *GDB Remote Stub* from **DeSmuME** it will allow to pause, continue, set breakpoints, 
 view RAM memory, change in runtime code and many other features.
 
