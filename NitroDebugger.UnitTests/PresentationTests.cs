@@ -127,13 +127,28 @@ namespace UnitTests
 			Assert.IsInstanceOf<OkReply>(responsePacket);
 
 			byte ack = (byte)connection.GetStream().ReadByte();
-			Assert.AreEqual(ack, RawPacket.Ack);
+			Assert.AreEqual(RawPacket.Ack, ack);
 		}
 
 		[Test]
 		public void RequestResent()
 		{
-			Assert.Fail();
+			//							       $     O     K     #     9     b
+			byte[] responseBad = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x62 };
+			connection.GetStream().Write(responseBad, 0, responseBad.Length);
+
+			//							        $     O     K     #     9     a
+			byte[] responseGood = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x61 };
+			connection.GetStream().Write(responseGood, 0, responseGood.Length);
+
+			ReplyPacket responsePacket = presentation.ReceiveReply();
+			Assert.IsInstanceOf<OkReply>(responsePacket);
+
+			byte firstNack = (byte)connection.GetStream().ReadByte();
+			Assert.AreEqual(RawPacket.Nack, firstNack);
+
+			byte ack = (byte)connection.GetStream().ReadByte();
+			Assert.AreEqual(RawPacket.Ack, ack);
 		}
 
 		[Test]
