@@ -73,19 +73,32 @@ namespace NitroDebugger.RSP
 		public ReplyPacket ReceiveReply()
 		{
 			ReplyPacket response = null;
+			int count = 0;
 
-			while (response == null) {
-				try {
-					// Get data
-					byte[] packet = this.session.ReadPacket(PacketSeparator);
-					response = PacketBinConverter.FromBinary(packet);
+			do {
+				if (count == MaxWriteAttemps)
+					throw new ProtocolViolationException("[PRES] Can not receive correctly");
+				count++;
 
-					// Send ACK
-					this.session.Write(RawPacket.Ack);
-				} catch (FormatException) {
-					// Error... send NACK
-					this.session.Write(RawPacket.Nack);
-				}
+				response = this.NextReply();
+			} while (response == null);
+
+			return response;
+		}
+
+		private ReplyPacket NextReply()
+		{
+			ReplyPacket response = null;
+			try {
+				// Get data
+				byte[] packet = this.session.ReadPacket(PacketSeparator);
+				response = PacketBinConverter.FromBinary(packet);
+
+				// Send ACK
+				this.session.Write(RawPacket.Ack);
+			} catch (FormatException) {
+				// Error... send NACK
+				this.session.Write(RawPacket.Nack);
 			}
 
 			return response;

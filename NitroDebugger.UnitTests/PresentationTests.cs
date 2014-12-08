@@ -116,39 +116,46 @@ namespace UnitTests
 				() => SendCommand("test2", "arg1,arg2", "f5", 11));
 		}
 
-		[Test]
-		public void ReceiveMessage()
+		private void ReceiveMessageBad(int attempts)
 		{
-			//							    $     O     K     #     9     a
-			byte[] response = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x61 };
-			connection.GetStream().Write(response, 0, response.Length);
+			//							       $     O     K     #     9     b
+			byte[] responseBad = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x62 };
+
+			//							        $     O     K     #     9     a
+			byte[] responseGood = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x61 };
+
+			for (int i = 0; i < attempts - 1; i++)
+				connection.GetStream().Write(responseBad, 0, responseBad.Length);
+			connection.GetStream().Write(responseGood, 0, responseGood.Length);
 
 			ReplyPacket responsePacket = presentation.ReceiveReply();
 			Assert.IsInstanceOf<OkReply>(responsePacket);
+
+			for (int i = 0; i < attempts - 1; i++) {
+				byte nack = (byte)connection.GetStream().ReadByte();
+				Assert.AreEqual(RawPacket.Nack, nack);
+			}
 
 			byte ack = (byte)connection.GetStream().ReadByte();
 			Assert.AreEqual(RawPacket.Ack, ack);
 		}
 
 		[Test]
+		public void ReceiveMessage()
+		{
+			ReceiveMessageBad(1);
+		}
+
+		[Test]
 		public void RequestResent()
 		{
-			//							       $     O     K     #     9     b
-			byte[] responseBad = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x62 };
-			connection.GetStream().Write(responseBad, 0, responseBad.Length);
+			ReceiveMessageBad(3);
+		}
 
-			//							        $     O     K     #     9     a
-			byte[] responseGood = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x61 };
-			connection.GetStream().Write(responseGood, 0, responseGood.Length);
-
-			ReplyPacket responsePacket = presentation.ReceiveReply();
-			Assert.IsInstanceOf<OkReply>(responsePacket);
-
-			byte firstNack = (byte)connection.GetStream().ReadByte();
-			Assert.AreEqual(RawPacket.Nack, firstNack);
-
-			byte ack = (byte)connection.GetStream().ReadByte();
-			Assert.AreEqual(RawPacket.Ack, ack);
+		[Test]
+		public void ReceiveTooManyBadMessages()
+		{
+			Assert.Throws<ProtocolViolationException>(() => ReceiveMessageBad(11));
 		}
 
 		[Test]
