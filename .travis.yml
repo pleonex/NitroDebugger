@@ -1,0 +1,8 @@
+## Travis CI Integration
+language: c
+
+install:
+  - sudo apt-get install mono-devel mono-gmcs nunit-console
+script:
+  - xbuild NitroDebugger.sln
+  - nunit-console NitroDebugger.UnitTests/bin/Debug/NitroDebugger.UnitTests.dll
