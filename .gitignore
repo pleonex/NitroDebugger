@@ -1,3 +1,5 @@
 NitroDebugger/bin/
 NitroDebugger/obj/
+NitroDebugger.UnitTests/bin/
+NitroDebugger.UnitTests/obj/
 *.userprefs
