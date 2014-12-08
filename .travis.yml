@@ -2,6 +2,7 @@
 language: c
 
 install:
+  - sudo add-apt-repository -y "deb http://download.mono-project.com/repo/debian wheezy main" && sudo apt-get update
   - sudo apt-get install mono-devel mono-gmcs nunit-console
   - wget http://nuget.org/nuget.exe -O ./.nuget/NuGet.exe
   - chmod a+x ./.nuget/NuGet.exe
