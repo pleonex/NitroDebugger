@@ -19,7 +19,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Text;
 
 namespace NitroDebugger.RSP
 {
@@ -29,14 +28,13 @@ namespace NitroDebugger.RSP
 	public class Presentation
 	{
 		private const int MaxWriteAttemps = 10;
+		private const byte PacketSeparator = 0x24;	// '$'
 
 		private Session session;
-		private StringBuilder buffer;
 
 		public Presentation(string hostname, int port)
 		{
 			this.session = new Session(hostname, port);
-			this.buffer  = new StringBuilder();
 		}
 
 		public void Close()
@@ -44,13 +42,12 @@ namespace NitroDebugger.RSP
 			this.session.Close();
 		}
 
-		public string Break()
+		public void SendCommand(CommandPacket command)
 		{
-			this.session.Write(0x03);
-			return this.Read();
+			this.SendData(PacketBinConverter.ToBinary(command));
 		}
 
-		public void Write(string message)
+		private void SendData(byte[] data)
 		{
 			int count = 0;
 			int response;
@@ -60,52 +57,36 @@ namespace NitroDebugger.RSP
 					throw new Exception("Can not send packet successfully");
 				count++;
 
-				Packet packet = new Packet(message);
-				byte[] data = packet.GetBinary();
 				this.session.Write(data);
-
-				// Get the response
-				do
-					response = this.session.ReadByte();
-				while (response == -1);
-
-				// Check the response is valid
-				if (response != Packet.Ack && response != Packet.Nack)
-					throw new Exception("Invalid ACK/NACK");
-
-			} while (response != Packet.Ack);
+				response = this.session.ReadByte();
+			} while (response != RawPacket.Ack);
 		}
 
-		public string Read()
+		public ReplyPacket SendInterrupt()
 		{
-			do
-				this.UpdateBuffer();
-			while (buffer.Length == 0);
-
-			string command = null;
-
-			try {
-				// Get packet
-				Packet response = Packet.FromBinary(buffer);
-				command = response.Command;
-
-				// Send ACK
-				this.session.Write(Packet.Ack);
-			} catch (FormatException ex) {
-				// Error... send NACK
-				this.session.Write(Packet.Nack);
-			}
-
-
-			return command;
+			this.session.Write(RawPacket.Interrupt);
+			return this.ReceiveReply();
 		}
 
-		private void UpdateBuffer()
+		public ReplyPacket ReceiveReply()
 		{
-			while (this.session.DataAvailable) {
-				byte[] data = this.session.ReadBytes();
-				buffer.AppendFormat("{0}", Encoding.ASCII.GetString(data));
+			ReplyPacket response = null;
+
+			while (response != null) {
+				try {
+					// Get data
+					byte[] packet = this.session.ReadPacket(PacketSeparator);
+					response = PacketBinConverter.FromBinary(packet);
+
+					// Send ACK
+					this.session.Write(RawPacket.Ack);
+				} catch (FormatException) {
+					// Error... send NACK
+					this.session.Write(RawPacket.Nack);
+				}
 			}
+
+			return response;
 		}
 	}
 }

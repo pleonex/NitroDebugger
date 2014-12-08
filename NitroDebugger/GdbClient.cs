@@ -42,33 +42,27 @@ namespace NitroDebugger.RSP
 
 		public StopType GetHaltedReason()
 		{
-			presentation.Write("?");
-			string response = presentation.Read();
-			return this.ParseStopResponse(response);
+			throw new NotImplementedException();
 		}
 
 		public StopType Stop()
 		{
-			string response = this.presentation.Break();
-			return this.ParseStopResponse(response);
+			throw new NotImplementedException();
 		}
 
 		public void Continue()
 		{
-			this.presentation.Write("c");
+			throw new NotImplementedException();
 		}
 
 		public string Test()
 		{
-			this.presentation.Write("n2000800,4");
-			return this.presentation.Read();
+			throw new NotImplementedException();
 		}
 
 		public StopType NextStep()
 		{
-			this.presentation.Write("s");
-			string response = presentation.Read();
-			return this.ParseStopResponse(response);
+			throw new NotImplementedException();
 		}
 
 		private StopType ParseStopResponse(string response)
