@@ -42,6 +42,7 @@
     <Compile Include="SessionTests.cs" />
     <Compile Include="PacketTests.cs" />
     <Compile Include="PacketTypesTest.cs" />
+    <Compile Include="PresentationTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

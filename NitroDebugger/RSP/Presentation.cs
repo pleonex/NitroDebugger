@@ -19,6 +19,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Net.Sockets;
+using System.Net;
 
 namespace NitroDebugger.RSP
 {
@@ -54,7 +56,7 @@ namespace NitroDebugger.RSP
 
 			do {
 				if (count == MaxWriteAttemps)
-					throw new Exception("Can not send packet successfully");
+					throw new ProtocolViolationException("[PRES] Can not send correctly");
 				count++;
 
 				this.session.Write(data);
@@ -72,7 +74,7 @@ namespace NitroDebugger.RSP
 		{
 			ReplyPacket response = null;
 
-			while (response != null) {
+			while (response == null) {
 				try {
 					// Get data
 					byte[] packet = this.session.ReadPacket(PacketSeparator);
