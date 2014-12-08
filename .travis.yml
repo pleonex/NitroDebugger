@@ -2,6 +2,7 @@
 language: c
 
 install:
+  - sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
   - sudo add-apt-repository -y "deb http://download.mono-project.com/repo/debian wheezy main" && sudo apt-get update
   - sudo apt-get install mono-devel mono-gmcs nunit-console
   - wget http://nuget.org/nuget.exe -O ./.nuget/NuGet.exe
