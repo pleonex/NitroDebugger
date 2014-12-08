@@ -47,9 +47,11 @@
     <Compile Include="RSP\CommandPacket.cs" />
     <Compile Include="RSP\ReplyPacket.cs" />
     <Compile Include="RSP\ReplyPacketFactory.cs" />
+    <Compile Include="RSP\Packets\OkReply.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="RSP\" />
+    <Folder Include="RSP\Packets\" />
   </ItemGroup>
 </Project>

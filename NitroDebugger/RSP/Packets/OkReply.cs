@@ -1,5 +1,5 @@
 ﻿//
-//  ReplyPacketFactory.cs
+//  OkReply.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -19,18 +19,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using NitroDebugger.RSP.Packets;
+using NitroDebugger.RSP;
 
-namespace NitroDebugger.RSP
+namespace NitroDebugger.RSP.Packets
 {
-	public static class ReplyPacketFactory
+	public class OkReply : ReplyPacket
 	{
-		public static ReplyPacket CreateReplyPacket(string data)
+		public OkReply()
 		{
-			if (data == "OK")
-				return new OkReply();
-
-			throw new NotImplementedException();
 		}
 	}
 }

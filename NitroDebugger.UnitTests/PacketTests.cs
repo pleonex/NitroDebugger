@@ -25,6 +25,7 @@ using NUnit.Framework;
 using NitroDebugger.RSP;
 using NitroDebugger;
 using System.Text;
+using NitroDebugger.RSP.Packets;
 
 namespace UnitTests
 {
@@ -193,9 +194,18 @@ namespace UnitTests
 		[Test]
 		public void FromBinReplyPacket()
 		{
-			//							$     O     K     #     9     c
-			byte[] data = new byte[] { 0x24, 0x51, 0x4B, 0x23, 0x39, 0x63 };
-			ReplyPacket actual = PacketBinConverter.FromBinary(data);
+			//							$     O     K     #     9     a
+			byte[] data = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x61 };
+			Assert.IsInstanceOf<OkReply>(PacketBinConverter.FromBinary(data));
+		}
+
+		[Test]
+		public void FromBinUnknownReplyPacket()
+		{
+			//							$     P     K     #     9     b
+			byte[] data = new byte[] { 0x24, 0x50, 0x4B, 0x23, 0x39, 0x62 };
+			Assert.Throws<NotImplementedException>(
+				() => PacketBinConverter.FromBinary(data));
 		}
 	}
 }
