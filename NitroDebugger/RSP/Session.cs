@@ -33,15 +33,13 @@ namespace NitroDebugger.RSP
 	{
 		private TcpClient client;
 		private NetworkStream stream;
+		private Queue<byte> buffer;
 
 		public Session(string hostname, int port)
 		{
 			this.client = new TcpClient(hostname, port);
 			this.stream = this.client.GetStream();
-		}
-
-		public bool DataAvailable {
-			get { return this.stream.DataAvailable; }
+			this.buffer = new Queue<byte>();
 		}
 
 		public void Close()
@@ -58,28 +56,43 @@ namespace NitroDebugger.RSP
 		{
 			this.stream.Write(data, 0, data.Length);
 		}
-
+			
 		public byte ReadByte()
 		{
-			int result = this.stream.ReadByte();
-			if (result == -1)
-				throw new EndOfStreamException("No more data to read!");
+			while (this.buffer.Count == 0)
+				this.UpdateBuffer();
 
-			return (byte)result;
+			return this.buffer.Dequeue();
 		}
 
-		public byte[] ReadBytes()
+		public byte[] ReadPacket(byte separator)
 		{
-			List<byte> received = new List<byte>();
+			do
+				this.UpdateBuffer();
+			while (this.buffer.Count == 0);
 
+			return this.GetPacket(separator);
+		}
+
+		private byte[] GetPacket(byte separator)
+		{
+			List<byte> packet = new List<byte>(5);
+			packet.Add(this.buffer.Dequeue());
+
+			while (this.buffer.Count > 0 && this.buffer.Peek() != separator)
+				packet.Add(this.buffer.Dequeue());
+
+			return packet.ToArray();
+		}
+
+		private void UpdateBuffer()
+		{
 			byte[] buffer = new byte[1024];
-			while (this.DataAvailable) {
+			while (this.stream.DataAvailable) {
 				int read = this.stream.Read(buffer, 0, buffer.Length);
-				Array.Resize<byte>(ref buffer, read);
-				received.AddRange(buffer);
+				for (int i = 0; i < read; i++)
+					this.buffer.Enqueue(buffer[i]);
 			}
-
-			return received.ToArray();
 		}
 	}
 }

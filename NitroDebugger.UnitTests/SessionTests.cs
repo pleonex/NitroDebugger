@@ -117,7 +117,7 @@ namespace UnitTests
 		[Test]
 		public void CanReceiveByte()
 		{
-			byte expected = 0xCA;
+			byte expected = 0x03;
 
 			Session session = new Session("localhost", DefaultPort);
 			AcceptAndSendBytes(new byte[] { expected });
@@ -129,51 +129,38 @@ namespace UnitTests
 		}
 
 		[Test]
-		public void ReceiveEndOfStream()
+		public void ReceiveUntilByteIsFirstToo()
 		{
 			Session session = new Session("localhost", DefaultPort);
-
 			TcpClient client = server.AcceptTcpClient();
-			client.Close();
 
-			Assert.Throws<EndOfStreamException>(() => session.ReadByte());
+			byte sepByte = 0xCA;
+			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE };
+			byte[] packet = new byte[] { 0xCA, 0xFE, 0xBE, 0xCA, 0xFE };
+			client.GetStream().Write(packet, 0, packet.Length);
 
-			session.Close();
-		}
-
-		[Test]
-		public void CanReceiveBytes()
-		{
-			byte[] expected = new byte[] { 0xCA, 0xFE };
-		
-			Session session = new Session("localhost", DefaultPort);
-			AcceptAndSendBytes(expected);
-
-			byte[] actual = session.ReadBytes();
-			session.Close();
-
+			byte[] actual = session.ReadPacket(sepByte);
 			Assert.AreEqual(expected, actual);
+
+			client.Close();
+			session.Close();
 		}
 
 		[Test]
-		public void HasDataAvailable()
+		public void ReceiveUntilByteNoRepeated()
 		{
 			Session session = new Session("localhost", DefaultPort);
-			AcceptAndSendBytes(new byte[] { 0xCA, 0xFE });
-			session.ReadByte();
+			TcpClient client = server.AcceptTcpClient();
 
-			Assert.IsTrue(session.DataAvailable);
-		}
+			byte sepByte = 0xCA;
+			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE };
+			client.GetStream().Write(expected, 0, expected.Length);
 
-		[Test]
-		public void HasNoDataAvailable()
-		{
-			Session session = new Session("localhost", DefaultPort);
-			AcceptAndSendBytes(new byte[] { 0xCA, 0xFE });
-			session.ReadByte();
-			session.ReadByte();
+			byte[] actual = session.ReadPacket(sepByte);
+			Assert.AreEqual(expected, actual);
 
-			Assert.IsFalse(session.DataAvailable);
+			client.Close();
+			session.Close();
 		}
 	}
 }
