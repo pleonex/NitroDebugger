@@ -2,4 +2,6 @@ NitroDebugger/bin/
 NitroDebugger/obj/
 NitroDebugger.UnitTests/bin/
 NitroDebugger.UnitTests/obj/
+.nuget/NuGet.exe
 *.userprefs
+packages/
