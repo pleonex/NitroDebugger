@@ -31,68 +31,93 @@ namespace NitroDebugger.RSP
 	/// </summary>
 	public enum TargetSignals : byte
 	{
-		/* Used some places (e.g. stop_signal) to record the concept that there is no signal. */
-		TARGET_SIGNAL_0 = 0,
-		TARGET_SIGNAL_FIRST = 0,
-		TARGET_SIGNAL_HUP = 1,
-		TARGET_SIGNAL_INT = 2,
-		TARGET_SIGNAL_QUIT = 3,
-		TARGET_SIGNAL_ILL = 4,
-		TARGET_SIGNAL_TRAP = 5,
-		TARGET_SIGNAL_ABRT = 6,
-		TARGET_SIGNAL_EMT = 7,
-		TARGET_SIGNAL_FPE = 8,
-		TARGET_SIGNAL_KILL = 9,
-		TARGET_SIGNAL_BUS = 10,
-		TARGET_SIGNAL_SEGV = 11,
-		TARGET_SIGNAL_SYS = 12,
-		TARGET_SIGNAL_PIPE = 13,
-		TARGET_SIGNAL_ALRM = 14,
-		TARGET_SIGNAL_TERM = 15,
-		TARGET_SIGNAL_URG = 16,
-		TARGET_SIGNAL_STOP = 17,
-		TARGET_SIGNAL_TSTP = 18,
-		TARGET_SIGNAL_CONT = 19,
-		TARGET_SIGNAL_CHLD = 20,
-		TARGET_SIGNAL_TTIN = 21,
-		TARGET_SIGNAL_TTOU = 22,
-		TARGET_SIGNAL_IO = 23,
-		TARGET_SIGNAL_XCPU = 24,
-		TARGET_SIGNAL_XFSZ = 25,
-		TARGET_SIGNAL_VTALRM = 26,
-		TARGET_SIGNAL_PROF = 27,
-		TARGET_SIGNAL_WINCH = 28,
-		TARGET_SIGNAL_LOST = 29,
-		TARGET_SIGNAL_USR1 = 30,
-		TARGET_SIGNAL_USR2 = 31,
-		TARGET_SIGNAL_PWR = 32,
-		/* Similar to SIGIO. Perhaps they should have the same number. */
-		TARGET_SIGNAL_POLL = 33,
-		TARGET_SIGNAL_WIND = 34,
-		TARGET_SIGNAL_PHONE = 35,
-		TARGET_SIGNAL_WAITING = 36,
-		TARGET_SIGNAL_LWP = 37,
-		TARGET_SIGNAL_DANGER = 38,
-		TARGET_SIGNAL_GRANT = 39,
-		TARGET_SIGNAL_RETRACT = 40,
-		TARGET_SIGNAL_MSG = 41,
-		TARGET_SIGNAL_SOUND = 42,
-		TARGET_SIGNAL_SAK = 43,
-		TARGET_SIGNAL_PRIO = 44,
+		NoSignal = 0,
+		First = 0,
+		Hup = 1,
+		Int = 2,
+		Quit = 3,
+		Ill = 4,
+		Trap = 5,
+		Abrt = 6,
+		Emt = 7,
+		Fpe = 8,
+		Kill = 9,
+		Bus = 10,
+		Segv = 11,
+		Sys = 12,
+		Pipe = 13,
+		Alrm = 14,
+		Term = 15,
+		Urg = 16,
+		Stop = 17,
+		Tstp = 18,
+		Cont = 19,
+		Chld = 20,
+		Ttin = 21,
+		Ttou = 22,
+		Io = 23,
+		Xcpu = 24,
+		Xfsz = 25,
+		Vtalrm = 26,
+		Prof = 27,
+		Winch = 28,
+		Lost = 29,
+		Usr1 = 30,
+		Usr2 = 31,
+		Pwr = 32,
+		Poll = 33,
+		Wind = 34,
+		Phone = 35,
+		Waiting = 36,
+		Lwp = 37,
+		Danger = 38,
+		Grant = 39,
+		Retract = 40,
+		Msg = 41,
+		Sound = 42,
+		Sak = 43,
+		Prio = 44,
 	};
 
 	/// <summary>
 	/// Enumeration to indicate why the game halted.
 	/// Copied from: https://sourceforge.net/p/desmume/code/HEAD/tree/trunk/desmume/src/gdbstub/gdbstub_internal.h
 	/// </summary>
-	public enum StopType {
-		STOP_UNKNOWN,
-		STOP_HOST_BREAK,
-		STOP_STEP_BREAK,
-		STOP_BREAKPOINT,
-		STOP_WATCHPOINT,
-		STOP_RWATCHPOINT,
-		STOP_AWATCHPOINT
-	}; 
+	[Flags]
+	public enum StopSignal {
+		Unknown = 0,
+		HostBreak = 1,
+		StepBreak = 2,
+		Breakpoint = 4,
+		Watchpoint = 8,
+		ReadWatchpoint = 16,
+		AccessWatchpoint = 32
+	};
+
+	public static class StopSignalExtension
+	{
+		/// <summary>
+		/// Converts from the TargetSignal enum used by GDB officially to StopType used internally by DeSmuME.
+		/// It gives more info about the reason.
+		/// </summary>
+		/// <returns>The to stop.</returns>
+		/// <param name="signal">Signal.</param>
+		public static StopSignal ToStopSignal(this TargetSignals signal)
+		{
+			switch (signal) {
+			case TargetSignals.Int:
+				return StopSignal.HostBreak;
+
+			case TargetSignals.Trap:
+				return StopSignal.Breakpoint | StopSignal.StepBreak;
+
+			case TargetSignals.Abrt:
+				return StopSignal.Watchpoint | StopSignal.ReadWatchpoint | StopSignal.AccessWatchpoint;
+
+			default:
+				return StopSignal.Unknown;
+			}
+		}
+	}
 }
 

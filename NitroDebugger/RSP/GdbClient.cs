@@ -40,12 +40,12 @@ namespace NitroDebugger.RSP
 			this.presentation.Close();
 		}
 
-		public StopType GetHaltedReason()
+		public StopSignal GetHaltedReason()
 		{
 			throw new NotImplementedException();
 		}
 
-		public StopType Stop()
+		public StopSignal Stop()
 		{
 			throw new NotImplementedException();
 		}
@@ -60,41 +60,18 @@ namespace NitroDebugger.RSP
 			throw new NotImplementedException();
 		}
 
-		public StopType NextStep()
+		public StopSignal NextStep()
 		{
 			throw new NotImplementedException();
 		}
 
-		private StopType ParseStopResponse(string response)
+		private StopSignal ParseStopResponse(string response)
 		{
 			if (response.Length == 3 && response[0] == 'S') {
 				int signal = Convert.ToInt32(response.Substring(1, 2));
-				return this.SignalToStop((TargetSignals)signal);
+				return ((TargetSignals)signal).ToStopSignal();
 			} else {
 				throw new FormatException("Unexpected response");
-			}
-		}
-
-		/// <summary>
-		/// Converts from the TargetSignal enum used by GDB officially to StopType used internally by DeSmuME.
-		/// It gives more info about the reason.
-		/// </summary>
-		/// <returns>The to stop.</returns>
-		/// <param name="signal">Signal.</param>
-		private StopType SignalToStop(TargetSignals signal)
-		{
-			switch (signal) {
-			case TargetSignals.TARGET_SIGNAL_INT:
-				return StopType.STOP_HOST_BREAK;
-
-			case TargetSignals.TARGET_SIGNAL_TRAP:
-				return StopType.STOP_BREAKPOINT;	// Should return also STOP_STEP_BREAK
-
-			case TargetSignals.TARGET_SIGNAL_ABRT:	// Should return also STOP_RWATCHPOINT and STOP_AWATCHPOINT
-				return StopType.STOP_WATCHPOINT;
-
-			default:
-				return StopType.STOP_UNKNOWN;
 			}
 		}
 	}

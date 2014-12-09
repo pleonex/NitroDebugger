@@ -45,6 +45,7 @@
     <Compile Include="PacketTests.cs" />
     <Compile Include="PacketTypesTest.cs" />
     <Compile Include="PresentationTests.cs" />
+    <Compile Include="Signals.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -56,5 +57,5 @@
       <Name>NitroDebugger</Name>
     </ProjectReference>
   </ItemGroup>
-    <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
 </Project>
