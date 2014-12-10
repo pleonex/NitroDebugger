@@ -112,18 +112,20 @@ namespace NitroDebugger.RSP
 		private ReplyPacket SafeInterruption()
 		{
 			ReplyPacket response = null;
+			bool error = false;
 			try {
 				response = this.presentation.SendInterrupt();
 			} catch (SocketException) {
-				OnLostConnection(EventArgs.Empty);
+				error = true;
 			} catch (ProtocolViolationException) {
-				this.Disconnect();
-				OnLostConnection(EventArgs.Empty);
+				error = true;
 			}
 
-			if (response != null && !(response is StopSignalReply)) {
-				this.Disconnect();
-				OnLostConnection(EventArgs.Empty);
+			if (response != null && !(response is StopSignalReply))
+				error = true;
+
+			if (error) {
+				NetworkError();
 				response = null;
 			}
 
@@ -133,19 +135,22 @@ namespace NitroDebugger.RSP
 		private ReplyPacket SafeSending(CommandPacket command, params Type[] validReplyTypes)
 		{
 			ReplyPacket response = null;
+			bool error = false;
+
 			try {
 				this.presentation.SendCommand(command);
 				response = this.presentation.ReceiveReply();
 			} catch (SocketException) {
-				OnLostConnection(EventArgs.Empty);
+				error = true;
 			} catch (ProtocolViolationException) {
-				this.Disconnect();
-				OnLostConnection(EventArgs.Empty);
+				error = true;
 			}
 
-			if (response != null && !ValidateType(response, validReplyTypes)) {
-				this.Disconnect();
-				OnLostConnection(EventArgs.Empty);
+			if (response != null && !ValidateType(response, validReplyTypes))
+				error = true;
+
+			if (error) {
+				NetworkError();
 				response = null;
 			}
 
@@ -155,6 +160,12 @@ namespace NitroDebugger.RSP
 		private bool ValidateType(ReplyPacket reply, Type[] validReplyTypes)
 		{
 			return validReplyTypes.Contains(reply.GetType());
+		}
+
+		private void NetworkError()
+		{
+			this.Disconnect();
+			OnLostConnection(EventArgs.Empty);
 		}
 	}
 }

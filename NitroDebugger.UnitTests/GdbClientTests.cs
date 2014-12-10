@@ -129,49 +129,29 @@ namespace UnitTests
 			this.serverStream.Write(packetBin, 0, packetBin.Length);
 		}
 
-		private void Read()
-		{
-			Thread.Sleep(50);
-			byte[] buffer = new byte[10 * 1024];
-			this.serverStream.Read(buffer, 0, buffer.Length);
-		}
-
 		[Test]
-		public void AskHaltedReason()
+		public void CommandUnknownReplyPacket()
 		{
-			this.SendPacket("S", "02");
-			StopSignal reason = this.client.AskHaltedReason();
-			this.Read();
-
-			Assert.IsTrue(reason.HasFlag(StopSignal.HostBreak));
-		}
-
-		[Test]
-		public void CommandError()
-		{
+			// Send as many times as the maximum counter of Presentation layer
 			for (int i = 0; i < 10; i++)
 				this.SendPacket("@", "");
 
 			StopSignal reason = this.client.AskHaltedReason();
-			this.Read();
-
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
 		}
 
 		[Test]
-		public void CommandInvalidReply()
+		public void CommandUnexepectedReply()
 		{
 			this.SendPacket("OK", "");
 			StopSignal reason = this.client.AskHaltedReason();
-			this.Read();
-
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
 		}
 
 		[Test]
-		public void ConnectionClosedRaiseHandle()
+		public void CommandConnectionLostRaiseHandle()
 		{
 			this.serverClient.Close();
 			this.client.LostConnection += new LostConnectionEventHandle(LostConnection);
@@ -185,7 +165,7 @@ namespace UnitTests
 		}
 
 		[Test]
-		public void ConnectionClosedDoesNotRaiseHandle()
+		public void CommandConnectionLostDoesNotRaiseHandle()
 		{
 			this.serverClient.Close();
 			Assert.DoesNotThrow(() => this.client.AskHaltedReason());
@@ -196,41 +176,53 @@ namespace UnitTests
 		{
 			this.SendPacket("S", "02");
 			bool stopped = this.client.StopExecution();
-			this.Read();
-
 			Assert.IsTrue(stopped);
 		}
 
 		[Test]
-		public void InterruptError()
+		public void InterruptInvalidSignal()
 		{
+			this.SendPacket("S", "03");
+			bool stopped = this.client.StopExecution();
+			Assert.IsFalse(stopped);
+		}
+
+		[Test]
+		public void InterruptUnknownReplyPacket()
+		{
+			// Send as many times as the maximum counter of Presentation layer
 			for (int i = 0; i < 10; i++)
 				this.SendPacket("@", "");
-			bool stopped = this.client.StopExecution();
-			this.Read();
 
+			bool stopped = this.client.StopExecution();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.IsFalse(stopped);
 		}
 
 		[Test]
-		public void InterruptInvalidReply()
+		public void InterruptUnexepectedReply()
 		{
 			this.SendPacket("OK", "");
 			bool stopped = this.client.StopExecution();
-			this.Read();
-
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.IsFalse(stopped);
 		}
 
 		[Test]
-		public void InterruptConnectionLost()
+		public void InterruptConnectionLostRaiseHandle()
 		{
 			this.serverClient.Close();
 			this.client.LostConnection += new LostConnectionEventHandle(LostConnection);
 			bool stopped = this.client.StopExecution();
 			Assert.IsFalse(stopped);
+		}
+
+		[Test]
+		public void AskHaltedReason()
+		{
+			this.SendPacket("S", "02");
+			StopSignal reason = this.client.AskHaltedReason();
+			Assert.IsTrue(reason.HasFlag(StopSignal.HostBreak));
 		}
 	}
 }
