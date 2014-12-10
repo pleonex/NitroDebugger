@@ -10,3 +10,6 @@ are under *DeSmuMEmod* folder.
 It's been developped under *Fedora 20*, *mono 3.10.1* and *monodevelop 5.7*.
 * To compile in Linux either open the solution file in monodevelop or run `xbuild NitroDebugger.sln`.
 * To compile in Windows either open the solution file in Visual Studio or run `msbuild NitroDebugger.sln`.
+
+
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/pleonex/NitroDebugger?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
