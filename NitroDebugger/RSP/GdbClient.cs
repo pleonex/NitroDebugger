@@ -26,6 +26,8 @@ using NitroDebugger;
 
 namespace NitroDebugger.RSP
 {
+	public delegate void LostConnectionEventHandle(object sender, EventArgs e);
+
 	/// <summary>
 	/// GDB Client. Direct connection to emulator.
 	/// Application layer, only packets supported by DeSmuME implemented.
@@ -53,6 +55,14 @@ namespace NitroDebugger.RSP
 		public bool IsConnected {
 			get;
 			private set;
+		}
+
+		public event LostConnectionEventHandle LostConnection;
+
+		private void OnLostConnection(EventArgs e)
+		{
+			if (LostConnection != null)
+				LostConnection(this, e);
 		}
 
 		public void Connect()
@@ -96,7 +106,7 @@ namespace NitroDebugger.RSP
 				this.presentation.SendCommand(command);
 				response = this.presentation.ReceiveReply();
 			} catch (SocketException) {
-
+				OnLostConnection(EventArgs.Empty);
 			}
 
 			return response;

@@ -147,7 +147,7 @@ namespace UnitTests
 		}
 
 		[Test]
-		public void AskHaltedReasonInvalidReply()
+		public void AskHaltedReasonError()
 		{
 			this.SendPacket("OK", "");
 			StopSignal reason = this.client.AskHaltedReason();
@@ -155,11 +155,24 @@ namespace UnitTests
 		}
 
 		[Test]
-		public void AskHaltedReasonConnectionClosed()
+		public void ConnectionClosedRaiseHandle()
 		{
 			this.serverClient.Close();
-			StopSignal reason = this.client.AskHaltedReason();
-			Assert.AreEqual(StopSignal.Unknown, reason);
+			this.client.LostConnection += new LostConnectionEventHandle(LostConnection);
+			this.client.AskHaltedReason();
+		}
+
+		private void LostConnection(object sender, EventArgs e)
+		{
+			this.client.LostConnection -= new LostConnectionEventHandle(LostConnection);
+			Assert.Pass();
+		}
+
+		[Test]
+		public void ConnectionClosedDoesNotRaiseHandle()
+		{
+			this.serverClient.Close();
+			Assert.DoesNotThrow(() => this.client.AskHaltedReason());
 		}
 	}
 }
