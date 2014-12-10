@@ -147,10 +147,15 @@ namespace UnitTests
 		}
 
 		[Test]
-		public void AskHaltedReasonError()
+		public void CommandError()
 		{
-			this.SendPacket("OK", "");
+			for (int i = 0; i < 10; i++)
+				this.SendPacket("@", "");
+
 			StopSignal reason = this.client.AskHaltedReason();
+			this.Read();
+
+			Assert.IsFalse(this.client.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
 		}
 
@@ -173,6 +178,37 @@ namespace UnitTests
 		{
 			this.serverClient.Close();
 			Assert.DoesNotThrow(() => this.client.AskHaltedReason());
+		}
+
+		[Test]
+		public void Interrupt()
+		{
+			this.SendPacket("S", "02");
+			bool stopped = this.client.StopExecution();
+			this.Read();
+
+			Assert.IsTrue(stopped);
+		}
+
+		[Test]
+		public void InterruptError()
+		{
+			for (int i = 0; i < 10; i++)
+				this.SendPacket("@", "");
+			bool stopped = this.client.StopExecution();
+			this.Read();
+
+			Assert.IsFalse(this.client.IsConnected);
+			Assert.IsFalse(stopped);
+		}
+
+		[Test]
+		public void InterruptConnectionLost()
+		{
+			this.serverClient.Close();
+			this.client.LostConnection += new LostConnectionEventHandle(LostConnection);
+			bool stopped = this.client.StopExecution();
+			Assert.IsFalse(stopped);
 		}
 	}
 }

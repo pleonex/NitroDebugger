@@ -101,6 +101,31 @@ namespace NitroDebugger.RSP
 			return stopSignal.Signal;
 		}
 
+		public bool StopExecution()
+		{
+			ReplyPacket response = this.SafeInterruption();
+			StopSignalReply stopSignal = response as StopSignalReply;
+			if (stopSignal == null)
+				return false;
+
+			return stopSignal.Signal.HasFlag(StopSignal.HostBreak);
+		}
+
+		private ReplyPacket SafeInterruption()
+		{
+			ReplyPacket response = null;
+			try {
+				response = this.presentation.SendInterrupt();
+			} catch (SocketException) {
+				OnLostConnection(EventArgs.Empty);
+			} catch (ProtocolViolationException) {
+				this.Disconnect();
+				OnLostConnection(EventArgs.Empty);
+			}
+
+			return response;
+		}
+
 		private ReplyPacket SafeSending(CommandPacket command)
 		{
 			ReplyPacket response = null;
@@ -108,6 +133,9 @@ namespace NitroDebugger.RSP
 				this.presentation.SendCommand(command);
 				response = this.presentation.ReceiveReply();
 			} catch (SocketException) {
+				OnLostConnection(EventArgs.Empty);
+			} catch (ProtocolViolationException) {
+				this.Disconnect();
 				OnLostConnection(EventArgs.Empty);
 			}
 

@@ -33,7 +33,7 @@ namespace NitroDebugger.RSP
 			if (data.Length == 3 && data[0] == 'S')
 				return new StopSignalReply(Convert.ToInt32(data.Substring(1)));
 
-			throw new NotSupportedException("Unsupported reply");
+			throw new FormatException("Unknown reply");
 		}
 	}
 }
