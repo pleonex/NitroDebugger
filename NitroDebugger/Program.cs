@@ -97,7 +97,7 @@ namespace NitroDebugger
 				}
 			} while (!finish);
 
-			client.Close();
+			client.Disconnect();
 		}
 	}
 }

@@ -19,6 +19,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Net.Sockets;
 
 namespace NitroDebugger.RSP
 {
@@ -30,14 +31,47 @@ namespace NitroDebugger.RSP
 	{
 		private Presentation presentation;
 
-		public GdbClient(string hostname, int port)
+		public GdbClient(string host, int port)
 		{
-			this.presentation = new Presentation(hostname, port);
+			this.Host = host;
+			this.Port = port;
 		}
 
-		public void Close()
+		public string Host {
+			get;
+			private set;
+		}
+
+		public int Port {
+			get;
+			private set;
+		}
+
+		public bool IsConnected {
+			get;
+			private set;
+		}
+
+		public void Connect()
 		{
+			if (this.IsConnected)
+				return;
+
+			try {
+				this.presentation = new Presentation(this.Host, this.Port);
+				this.IsConnected = true;
+			} catch (SocketException) {
+				this.IsConnected = false;
+			}
+		}
+
+		public void Disconnect()
+		{
+			if (!this.IsConnected)
+				return;
+
 			this.presentation.Close();
+			this.IsConnected = false;
 		}
 
 		public StopSignal GetHaltedReason()
