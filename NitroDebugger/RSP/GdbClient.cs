@@ -61,6 +61,8 @@ namespace NitroDebugger.RSP
 
 		private void OnLostConnection(EventArgs e)
 		{
+			this.IsConnected = false;
+
 			if (LostConnection != null)
 				LostConnection(this, e);
 		}

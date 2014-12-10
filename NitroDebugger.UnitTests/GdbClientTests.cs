@@ -165,7 +165,7 @@ namespace UnitTests
 		private void LostConnection(object sender, EventArgs e)
 		{
 			this.client.LostConnection -= new LostConnectionEventHandle(LostConnection);
-			Assert.Pass();
+			Assert.IsTrue(!this.client.IsConnected);
 		}
 
 		[Test]
