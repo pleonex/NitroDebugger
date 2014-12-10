@@ -27,6 +27,7 @@ using Moq;
 using Moq.Protected;
 using NitroDebugger;
 using System.Threading;
+using System.Text;
 
 namespace UnitTests
 {
@@ -223,6 +224,23 @@ namespace UnitTests
 			this.SendPacket("S", "02");
 			StopSignal reason = this.client.AskHaltedReason();
 			Assert.IsTrue(reason.HasFlag(StopSignal.HostBreak));
+		}
+
+		[Test]
+		public void ContinueExecution()
+		{
+			this.serverStream.WriteByte(RawPacket.Ack);
+			this.client.ContinueExecution();
+			string rcv = this.Read();
+			Assert.AreEqual("c", rcv.Substring(1, rcv.Length - 4));
+		}
+
+		private string Read()
+		{
+			Thread.Sleep(50);
+			byte[] buffer = new byte[10 * 1024];
+			int read = this.serverStream.Read(buffer, 0, buffer.Length);
+			return Encoding.ASCII.GetString(buffer, 0, read);
 		}
 	}
 }

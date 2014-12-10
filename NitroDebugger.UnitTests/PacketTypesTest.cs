@@ -137,6 +137,15 @@ namespace UnitTests
 		{
 			HaltedReasonCommand cmd = new HaltedReasonCommand();
 			Assert.AreEqual("?", cmd.Command);
+			Assert.AreEqual("?", cmd.Pack());
+		}
+
+		[Test]
+		public void CreateContinueCommand()
+		{
+			ContinueCommand cmd = new ContinueCommand();
+			Assert.AreEqual("c", cmd.Command);
+			Assert.AreEqual("c", cmd.Pack());
 		}
 	}
 }

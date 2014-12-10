@@ -109,6 +109,12 @@ namespace NitroDebugger.RSP
 			return ((StopSignalReply)response).Signal.HasFlag(StopSignal.HostBreak);
 		}
 
+		public void ContinueExecution()
+		{
+			ContinueCommand cont = new ContinueCommand();
+			this.SafeSending(cont);
+		}
+
 		private ReplyPacket SafeInterruption()
 		{
 			ReplyPacket response = null;
@@ -139,7 +145,9 @@ namespace NitroDebugger.RSP
 
 			try {
 				this.presentation.SendCommand(command);
-				response = this.presentation.ReceiveReply();
+
+				if (validReplyTypes.Length > 0)
+					response = this.presentation.ReceiveReply();
 			} catch (SocketException) {
 				error = true;
 			} catch (ProtocolViolationException) {
