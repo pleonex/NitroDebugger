@@ -30,7 +30,7 @@ namespace NitroDebugger.RSP
 			if (data == "OK")
 				return new OkReply();
 
-			throw new NotImplementedException();
+			throw new NotSupportedException("Unsupported reply");
 		}
 	}
 }

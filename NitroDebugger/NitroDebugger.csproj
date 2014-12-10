@@ -48,6 +48,7 @@
     <Compile Include="RSP\ReplyPacket.cs" />
     <Compile Include="RSP\ReplyPacketFactory.cs" />
     <Compile Include="RSP\Packets\OkReply.cs" />
+    <Compile Include="RSP\Packets\HaltedReasonCommand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

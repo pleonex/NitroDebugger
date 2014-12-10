@@ -53,42 +53,11 @@ namespace NitroDebugger
 				Console.Write("(gdb) "); 	string cmd = Console.ReadLine();
 
 				switch (cmd) {
+				case "exit":
 				case "gotobed":
-					Console.WriteLine("Ok, time to sleep.");
-					finish = true;
-					break;
-
 				case "gotouni":
 					Console.WriteLine("You are late again...");
 					finish = true;
-					break;
-
-				case "exit":
-					finish = true;
-					break;
-
-				case "iH?":
-				case "isHalted?":
-					Console.WriteLine(client.GetHaltedReason());
-					break;
-
-				case "sp!":
-				case "stop!":
-					Console.WriteLine(client.Stop());
-					break;
-
-				case "c!":
-				case "cont!":
-					client.Continue();
-					break;
-
-				case "nx!":
-				case "next!":
-					Console.WriteLine(client.NextStep());
-					break;
-
-				case "a":
-					Console.WriteLine(client.Test());
 					break;
 
 				default:

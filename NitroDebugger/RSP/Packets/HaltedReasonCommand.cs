@@ -1,5 +1,5 @@
 ﻿//
-//  PacketTypesTest.cs
+//  HaltedReason.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -19,33 +19,20 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using NUnit.Framework;
 using NitroDebugger.RSP;
-using NitroDebugger.RSP.Packets;
 
-namespace UnitTests
+namespace NitroDebugger.RSP.Packets
 {
-	[TestFixture]
-	public class PacketTypesTest
+	public class HaltedReasonCommand : CommandPacket
 	{
-		[Test]
-		public void CreateOkReply()
+		public HaltedReasonCommand()
+			: base("?")
 		{
-			new OkReply();
-			Assert.Pass();
 		}
 
-		[Test]
-		public void FactoryCreateOkReply()
+		protected override string PackArguments()
 		{
-			Assert.IsInstanceOf<OkReply>(ReplyPacketFactory.CreateReplyPacket("OK"));
-		}
-
-		[Test]
-		public void CreateHaltedReasonCommand()
-		{
-			new HaltedReasonCommand();
-			Assert.Pass();
+			return "";
 		}
 	}
 }

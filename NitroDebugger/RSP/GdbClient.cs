@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Net.Sockets;
+using NitroDebugger.RSP.Packets;
 
 namespace NitroDebugger.RSP
 {
@@ -74,28 +75,12 @@ namespace NitroDebugger.RSP
 			this.IsConnected = false;
 		}
 
-		public StopSignal GetHaltedReason()
+		public StopSignal AskHaltedReason()
 		{
-			throw new NotImplementedException();
-		}
+			HaltedReasonCommand packet = new HaltedReasonCommand();
+			this.presentation.SendCommand(packet);
 
-		public StopSignal Stop()
-		{
-			throw new NotImplementedException();
-		}
-
-		public void Continue()
-		{
-			throw new NotImplementedException();
-		}
-
-		public string Test()
-		{
-			throw new NotImplementedException();
-		}
-
-		public StopSignal NextStep()
-		{
+			ReplyPacket response = this.presentation.ReceiveReply();
 			throw new NotImplementedException();
 		}
 

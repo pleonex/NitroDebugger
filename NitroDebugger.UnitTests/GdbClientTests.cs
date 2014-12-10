@@ -23,6 +23,10 @@ using NUnit.Framework;
 using NitroDebugger.RSP;
 using System.Net.Sockets;
 using System.Net;
+using Moq;
+using Moq.Protected;
+using NitroDebugger;
+using System.Threading;
 
 namespace UnitTests
 {
@@ -111,6 +115,33 @@ namespace UnitTests
 		{
 			this.client.Disconnect();
 			Assert.DoesNotThrow(() => this.client.Disconnect());
+		}
+
+		public void SendPacket(string cmd, string args)
+		{
+			Mock<CommandPacket> packet = new Mock<CommandPacket>(cmd);
+			packet.Protected().Setup<string>("PackArguments").Returns(args);
+			byte[] packetBin = PacketBinConverter.ToBinary(packet.Object);
+
+			this.serverStream.WriteByte(RawPacket.Ack);
+			this.serverStream.Write(packetBin, 0, packetBin.Length);
+		}
+
+		private void Read()
+		{
+			Thread.Sleep(50);
+			byte[] buffer = new byte[10 * 1024];
+			this.serverStream.Read(buffer, 0, buffer.Length);
+		}
+
+		[Test]
+		public void AskHaltedReason()
+		{
+			this.SendPacket("S", "02");
+			StopSignal reason = this.client.AskHaltedReason();
+			this.Read();
+
+			Assert.AreEqual(StopSignal.HostBreak, reason);
 		}
 	}
 }
