@@ -150,14 +150,16 @@ namespace UnitTests
 		public void AskHaltedReasonInvalidReply()
 		{
 			this.SendPacket("OK", "");
-			Assert.Throws<ProtocolViolationException>(() => this.client.AskHaltedReason());
+			StopSignal reason = this.client.AskHaltedReason();
+			Assert.AreEqual(StopSignal.Unknown, reason);
 		}
 
 		[Test]
 		public void AskHaltedReasonConnectionClosed()
 		{
 			this.serverClient.Close();
-			Assert.Throws<SocketException>(() => this.client.AskHaltedReason());
+			StopSignal reason = this.client.AskHaltedReason();
+			Assert.AreEqual(StopSignal.Unknown, reason);
 		}
 	}
 }

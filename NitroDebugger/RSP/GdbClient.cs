@@ -22,6 +22,7 @@ using System;
 using System.Net.Sockets;
 using NitroDebugger.RSP.Packets;
 using System.Net;
+using NitroDebugger;
 
 namespace NitroDebugger.RSP
 {
@@ -78,15 +79,27 @@ namespace NitroDebugger.RSP
 
 		public StopSignal AskHaltedReason()
 		{
-			HaltedReasonCommand packet = new HaltedReasonCommand();
-			this.presentation.SendCommand(packet);
+			HaltedReasonCommand command = new HaltedReasonCommand();
+			ReplyPacket response = this.SafeSending(command);
 
-			ReplyPacket response = this.presentation.ReceiveReply();
 			StopSignalReply stopSignal = response as StopSignalReply;
 			if (stopSignal == null)
-				throw new ProtocolViolationException("Invalid response");
+				return StopSignal.Unknown;
 
 			return stopSignal.Signal;
+		}
+
+		private ReplyPacket SafeSending(CommandPacket command)
+		{
+			ReplyPacket response = null;
+			try {
+				this.presentation.SendCommand(command);
+				response = this.presentation.ReceiveReply();
+			} catch (SocketException) {
+
+			}
+
+			return response;
 		}
 	}
 }
