@@ -107,11 +107,11 @@ namespace NitroDebugger.RSP
 		private void UpdateBuffer()
 		{
 			byte[] buffer = new byte[1024];
-			do {
+			while (this.stream.DataAvailable) {
 				int read = this.stream.Read(buffer, 0, buffer.Length);
 				for (int i = 0; i < read; i++)
 					this.buffer.Enqueue(buffer[i]);
-			} while (this.stream.DataAvailable);
+			}
 		}
 	}
 }
