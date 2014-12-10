@@ -58,7 +58,8 @@ namespace UnitTests
 		public void Dispose()
 		{
 			this.client.Disconnect();
-			this.serverClient.Close();
+			if (this.serverClient.Connected)
+				this.serverClient.Close();
 			this.server.Stop();
 		}
 
@@ -66,7 +67,8 @@ namespace UnitTests
 		public void ResetServer()
 		{
 			this.client.Disconnect();
-			this.serverClient.Close();
+			if (this.serverClient.Connected)
+				this.serverClient.Close();
 
 			while (this.server.Pending())
 				this.server.AcceptTcpClient().Close();
@@ -145,10 +147,17 @@ namespace UnitTests
 		}
 
 		[Test]
-		public void AshHaltedReasonInvalidReply()
+		public void AskHaltedReasonInvalidReply()
 		{
 			this.SendPacket("OK", "");
 			Assert.Throws<ProtocolViolationException>(() => this.client.AskHaltedReason());
+		}
+
+		[Test]
+		public void AskHaltedReasonConnectionClosed()
+		{
+			this.serverClient.Close();
+			Assert.Throws<SocketException>(() => this.client.AskHaltedReason());
 		}
 	}
 }

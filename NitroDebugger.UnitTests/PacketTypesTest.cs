@@ -135,8 +135,8 @@ namespace UnitTests
 		[Test]
 		public void CreateHaltedReasonCommand()
 		{
-			new HaltedReasonCommand();
-			Assert.Pass();
+			HaltedReasonCommand cmd = new HaltedReasonCommand();
+			Assert.AreEqual("?", cmd.Command);
 		}
 	}
 }
