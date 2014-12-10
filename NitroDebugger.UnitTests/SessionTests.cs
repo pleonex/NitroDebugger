@@ -168,6 +168,38 @@ namespace UnitTests
 			client.Close();
 			session.Close();
 		}
+
+		[Test]
+		public void ThrowsExceptionTryingToReadByteOnClosed()
+		{
+			Session session = new Session("localhost", DefaultPort);
+			server.AcceptTcpClient().Close();
+			Assert.Throws<SocketException>(() => session.ReadByte());
+		}
+
+		[Test]
+		public void ThrowsExceptionTryingToReadPacketOnClosed()
+		{
+			Session session = new Session("localhost", DefaultPort);
+			server.AcceptTcpClient().Close();
+			Assert.Throws<SocketException>(() => session.ReadPacket(0xCA));
+		}
+
+		[Test]
+		public void ThrowsExceptionTryingToWriteByteOnClosed()
+		{
+			Session session = new Session("localhost", DefaultPort);
+			server.AcceptTcpClient().Close();
+			Assert.Throws<SocketException>(() => session.Write(0xCA));
+		}
+
+		[Test]
+		public void ThrowsExceptionTryingToWriteBytesOnClosed()
+		{
+			Session session = new Session("localhost", DefaultPort);
+			server.AcceptTcpClient().Close();
+			Assert.Throws<SocketException>(() => session.Write(new byte[] { 0xCA }));
+		}
 	}
 }
 

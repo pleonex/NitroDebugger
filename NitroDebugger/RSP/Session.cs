@@ -42,23 +42,39 @@ namespace NitroDebugger.RSP
 			this.buffer = new Queue<byte>();
 		}
 
+		public bool IsConnected {
+			get {
+				return !(client.Client.Poll(1, SelectMode.SelectRead) && client.Available == 0);
+			}
+		}
+
 		public void Close()
 		{
-			this.client.Close();
+			if (this.IsConnected)
+				this.client.Close();
 		}
 
 		public void Write(byte data)
 		{
+			if (!this.IsConnected)
+				throw new SocketException();
+
 			this.stream.WriteByte(data);
 		}
 
 		public void Write(byte[] data)
 		{
+			if (!this.IsConnected)
+				throw new SocketException();
+
 			this.stream.Write(data, 0, data.Length);
 		}
 			
 		public byte ReadByte()
 		{
+			if (!this.IsConnected)
+				throw new SocketException();
+
 			while (this.buffer.Count == 0)
 				this.UpdateBuffer();
 
@@ -67,6 +83,9 @@ namespace NitroDebugger.RSP
 
 		public byte[] ReadPacket(byte separator)
 		{
+			if (!this.IsConnected)
+				throw new SocketException();
+
 			do
 				this.UpdateBuffer();
 			while (this.buffer.Count == 0);
@@ -88,11 +107,11 @@ namespace NitroDebugger.RSP
 		private void UpdateBuffer()
 		{
 			byte[] buffer = new byte[1024];
-			while (this.stream.DataAvailable) {
+			do {
 				int read = this.stream.Read(buffer, 0, buffer.Length);
 				for (int i = 0; i < read; i++)
 					this.buffer.Enqueue(buffer[i]);
-			}
+			} while (this.stream.DataAvailable);
 		}
 	}
 }
