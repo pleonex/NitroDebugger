@@ -95,6 +95,7 @@ namespace UnitTests
 
 			string actual = Read();
 			Assert.AreEqual(expected, actual);
+			Assert.AreEqual(0, connection.Available);
 		}
 
 		[Test]
@@ -138,6 +139,8 @@ namespace UnitTests
 
 			byte ack = (byte)connection.GetStream().ReadByte();
 			Assert.AreEqual(RawPacket.Ack, ack);
+
+			Assert.AreEqual(0, connection.Available);
 		}
 
 		[Test]
@@ -163,6 +166,7 @@ namespace UnitTests
 		{
 			//							    $     O     K     #     9     a
 			byte[] response = new byte[] { 0x24, 0x4F, 0x4B, 0x23, 0x39, 0x61 };
+			connection.GetStream().WriteByte(RawPacket.Ack);
 			connection.GetStream().Write(response, 0, response.Length);
 
 			ReplyPacket responsePacket = presentation.SendInterrupt();
@@ -174,6 +178,8 @@ namespace UnitTests
 
 			byte ack = (byte)connection.GetStream().ReadByte();
 			Assert.AreEqual(RawPacket.Ack, ack);
+
+			Assert.AreEqual(0, connection.Available);
 		}
 	}
 }

@@ -66,7 +66,7 @@ namespace NitroDebugger.RSP
 
 		public ReplyPacket SendInterrupt()
 		{
-			this.session.Write(RawPacket.Interrupt);
+			this.SendData(new byte[] { RawPacket.Interrupt });
 			return this.ReceiveReply();
 		}
 

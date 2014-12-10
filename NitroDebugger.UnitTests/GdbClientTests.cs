@@ -178,6 +178,9 @@ namespace UnitTests
 			this.SendPacket("S", "02");
 			bool stopped = this.client.StopExecution();
 			Assert.IsTrue(stopped);
+
+			string rcv = this.Read();
+			Assert.AreEqual("\x03", rcv.Substring(0, rcv.Length - 1));
 		}
 
 		[Test]
@@ -224,6 +227,9 @@ namespace UnitTests
 			this.SendPacket("S", "02");
 			StopSignal reason = this.client.AskHaltedReason();
 			Assert.IsTrue(reason.HasFlag(StopSignal.HostBreak));
+
+			string rcv = this.Read();
+			Assert.AreEqual("?", rcv.Substring(1, rcv.Length - 5));
 		}
 
 		[Test]
