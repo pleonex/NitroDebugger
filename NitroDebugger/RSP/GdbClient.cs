@@ -115,6 +115,12 @@ namespace NitroDebugger.RSP
 			this.SafeSending(cont);
 		}
 
+		public void StepInto()
+		{
+			SingleStep step = new SingleStep();
+			this.SafeSending(step);
+		}
+
 		private ReplyPacket SafeInterruption()
 		{
 			ReplyPacket response = null;

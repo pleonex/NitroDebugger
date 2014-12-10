@@ -147,6 +147,14 @@ namespace UnitTests
 			Assert.AreEqual("c", cmd.Command);
 			Assert.AreEqual("c", cmd.Pack());
 		}
+
+		[Test]
+		public void CreateSingleStepCommand()
+		{
+			SingleStep cmd = new SingleStep();
+			Assert.AreEqual("s", cmd.Command);
+			Assert.AreEqual("s", cmd.Pack());
+		}
 	}
 }
 

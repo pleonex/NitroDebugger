@@ -51,6 +51,7 @@
     <Compile Include="RSP\Packets\HaltedReasonCommand.cs" />
     <Compile Include="RSP\Packets\StopSignalReply.cs" />
     <Compile Include="RSP\Packets\ContinueCommand.cs" />
+    <Compile Include="RSP\Packets\SingleStep.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -248,6 +248,15 @@ namespace UnitTests
 			int read = this.serverStream.Read(buffer, 0, buffer.Length);
 			return Encoding.ASCII.GetString(buffer, 0, read);
 		}
+
+		[Test]
+		public void StepInto()
+		{
+			this.serverStream.WriteByte(RawPacket.Ack);
+			this.client.StepInto();
+			string rcv = this.Read();
+			Assert.AreEqual("s", rcv.Substring(1, rcv.Length - 4));
+		}
 	}
 }
 
