@@ -57,6 +57,12 @@ namespace UnitTests
 		}
 
 		[Test]
+		public void ConnectLocalhostIpDefaultPort()
+		{
+			Assert.DoesNotThrow(() => new Session("127.0.0.1", DefaultPort));
+		}
+
+		[Test]
 		public void ConnectLocalhostDefaultPort()
 		{
 			Assert.DoesNotThrow(() => new Session("localhost", DefaultPort));
