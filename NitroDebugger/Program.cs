@@ -46,6 +46,7 @@ namespace NitroDebugger
 			Console.Write("Port: ");		int port = Convert.ToInt32(Console.ReadLine());
 			Console.WriteLine();
 			GdbClient client = new GdbClient(hostname, port);
+			client.Connect();
 
 			// Start the interactive console
 			bool finish = false;
@@ -53,11 +54,17 @@ namespace NitroDebugger
 				Console.Write("(gdb) "); 	string cmd = Console.ReadLine();
 
 				switch (cmd) {
+				case "quit":
 				case "exit":
 				case "gotobed":
 				case "gotouni":
 					Console.WriteLine("You are late again...");
 					finish = true;
+					break;
+
+				case "HR?":
+				case "haltedreason":
+					Console.WriteLine(client.AskHaltedReason());
 					break;
 
 				default:
