@@ -204,7 +204,7 @@ namespace UnitTests
 		{
 			//							$     P     K     #     9     b
 			byte[] data = new byte[] { 0x24, 0x50, 0x4B, 0x23, 0x39, 0x62 };
-			Assert.Throws<NotSupportedException>(
+			Assert.Throws<FormatException>(
 				() => PacketBinConverter.FromBinary(data));
 		}
 	}

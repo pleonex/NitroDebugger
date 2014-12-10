@@ -19,6 +19,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Linq;
 using System.Net.Sockets;
 using NitroDebugger.RSP.Packets;
 using System.Net;
@@ -92,23 +93,20 @@ namespace NitroDebugger.RSP
 		public StopSignal AskHaltedReason()
 		{
 			HaltedReasonCommand command = new HaltedReasonCommand();
-			ReplyPacket response = this.SafeSending(command);
-
-			StopSignalReply stopSignal = response as StopSignalReply;
-			if (stopSignal == null)
+			ReplyPacket response = this.SafeSending(command, typeof(StopSignalReply));
+			if (response == null)
 				return StopSignal.Unknown;
 
-			return stopSignal.Signal;
+			return ((StopSignalReply)response).Signal;
 		}
 
 		public bool StopExecution()
 		{
 			ReplyPacket response = this.SafeInterruption();
-			StopSignalReply stopSignal = response as StopSignalReply;
-			if (stopSignal == null)
+			if (response == null)
 				return false;
 
-			return stopSignal.Signal.HasFlag(StopSignal.HostBreak);
+			return ((StopSignalReply)response).Signal.HasFlag(StopSignal.HostBreak);
 		}
 
 		private ReplyPacket SafeInterruption()
@@ -123,10 +121,16 @@ namespace NitroDebugger.RSP
 				OnLostConnection(EventArgs.Empty);
 			}
 
+			if (response != null && !(response is StopSignalReply)) {
+				this.Disconnect();
+				OnLostConnection(EventArgs.Empty);
+				response = null;
+			}
+
 			return response;
 		}
 
-		private ReplyPacket SafeSending(CommandPacket command)
+		private ReplyPacket SafeSending(CommandPacket command, params Type[] validReplyTypes)
 		{
 			ReplyPacket response = null;
 			try {
@@ -139,7 +143,18 @@ namespace NitroDebugger.RSP
 				OnLostConnection(EventArgs.Empty);
 			}
 
+			if (response != null && !ValidateType(response, validReplyTypes)) {
+				this.Disconnect();
+				OnLostConnection(EventArgs.Empty);
+				response = null;
+			}
+
 			return response;
+		}
+
+		private bool ValidateType(ReplyPacket reply, Type[] validReplyTypes)
+		{
+			return validReplyTypes.Contains(reply.GetType());
 		}
 	}
 }

@@ -160,6 +160,17 @@ namespace UnitTests
 		}
 
 		[Test]
+		public void CommandInvalidReply()
+		{
+			this.SendPacket("OK", "");
+			StopSignal reason = this.client.AskHaltedReason();
+			this.Read();
+
+			Assert.IsFalse(this.client.IsConnected);
+			Assert.AreEqual(StopSignal.Unknown, reason);
+		}
+
+		[Test]
 		public void ConnectionClosedRaiseHandle()
 		{
 			this.serverClient.Close();
@@ -195,6 +206,17 @@ namespace UnitTests
 		{
 			for (int i = 0; i < 10; i++)
 				this.SendPacket("@", "");
+			bool stopped = this.client.StopExecution();
+			this.Read();
+
+			Assert.IsFalse(this.client.IsConnected);
+			Assert.IsFalse(stopped);
+		}
+
+		[Test]
+		public void InterruptInvalidReply()
+		{
+			this.SendPacket("OK", "");
 			bool stopped = this.client.StopExecution();
 			this.Read();
 
