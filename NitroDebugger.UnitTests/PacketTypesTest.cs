@@ -22,6 +22,7 @@ using System;
 using NUnit.Framework;
 using NitroDebugger.RSP;
 using NitroDebugger.RSP.Packets;
+using NitroDebugger;
 
 namespace UnitTests
 {
@@ -39,6 +40,96 @@ namespace UnitTests
 		public void FactoryCreateOkReply()
 		{
 			Assert.IsInstanceOf<OkReply>(ReplyPacketFactory.CreateReplyPacket("OK"));
+		}
+
+		[Test]
+		public void CreateStopSignalReplyHostBreak()
+		{
+			StopSignalReply reply = new StopSignalReply(2);
+			Assert.IsTrue(reply.Signal.HasFlag(StopSignal.HostBreak));
+		}
+
+		[Test]
+		public void FactoryStopSignalReplyHostBreak()
+		{
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket("S02");
+			Assert.IsInstanceOf<StopSignalReply>(reply);
+			Assert.IsTrue(((StopSignalReply)reply).Signal.HasFlag(StopSignal.HostBreak));
+		}
+
+		[Test]
+		public void CreateStopSignalReplyBreakpoint()
+		{
+			StopSignalReply reply = new StopSignalReply(5);
+			Assert.IsTrue(reply.Signal.HasFlag(StopSignal.Breakpoint));
+		}
+
+		[Test]
+		public void FactoryStopSignalReplyBreakpoint()
+		{
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket("S05");
+			Assert.IsInstanceOf<StopSignalReply>(reply);
+			Assert.IsTrue(((StopSignalReply)reply).Signal.HasFlag(StopSignal.Breakpoint));
+		}
+
+		[Test]
+		public void CreateStopSignalReplyStepBreak()
+		{
+			StopSignalReply reply = new StopSignalReply(5);
+			Assert.IsTrue(reply.Signal.HasFlag(StopSignal.StepBreak));
+		}
+
+		[Test]
+		public void FactoryStopSignalReplyStepBreak()
+		{
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket("S05");
+			Assert.IsInstanceOf<StopSignalReply>(reply);
+			Assert.IsTrue(((StopSignalReply)reply).Signal.HasFlag(StopSignal.StepBreak));
+		}
+
+		[Test]
+		public void CreateStopSignalReplyWatchpoint()
+		{
+			StopSignalReply reply = new StopSignalReply(6);
+			Assert.IsTrue(reply.Signal.HasFlag(StopSignal.Watchpoint));
+		}
+
+		[Test]
+		public void FactoryStopSignalReplyWatchpoint()
+		{
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket("S06");
+			Assert.IsInstanceOf<StopSignalReply>(reply);
+			Assert.IsTrue(((StopSignalReply)reply).Signal.HasFlag(StopSignal.Watchpoint));
+		}
+
+		[Test]
+		public void CreateStopSignalReplyAccessWatchpoint()
+		{
+			StopSignalReply reply = new StopSignalReply(6);
+			Assert.IsTrue(reply.Signal.HasFlag(StopSignal.AccessWatchpoint));
+		}
+
+		[Test]
+		public void FactoryStopSignalReplyAccessWatchpoint()
+		{
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket("S06");
+			Assert.IsInstanceOf<StopSignalReply>(reply);
+			Assert.IsTrue(((StopSignalReply)reply).Signal.HasFlag(StopSignal.AccessWatchpoint));
+		}
+
+		[Test]
+		public void CreateStopSignalReplyReadWatchpoint()
+		{
+			StopSignalReply reply = new StopSignalReply(6);
+			Assert.IsTrue(reply.Signal.HasFlag(StopSignal.ReadWatchpoint));
+		}
+
+		[Test]
+		public void FactoryStopSignalReplyReadWatchpoint()
+		{
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket("S06");
+			Assert.IsInstanceOf<StopSignalReply>(reply);
+			Assert.IsTrue(((StopSignalReply)reply).Signal.HasFlag(StopSignal.ReadWatchpoint));
 		}
 
 		[Test]

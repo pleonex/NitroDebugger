@@ -21,6 +21,7 @@
 using System;
 using System.Net.Sockets;
 using NitroDebugger.RSP.Packets;
+using System.Net;
 
 namespace NitroDebugger.RSP
 {
@@ -81,17 +82,11 @@ namespace NitroDebugger.RSP
 			this.presentation.SendCommand(packet);
 
 			ReplyPacket response = this.presentation.ReceiveReply();
-			throw new NotImplementedException();
-		}
+			StopSignalReply stopSignal = response as StopSignalReply;
+			if (stopSignal == null)
+				throw new ProtocolViolationException("Invalid response");
 
-		private StopSignal ParseStopResponse(string response)
-		{
-			if (response.Length == 3 && response[0] == 'S') {
-				int signal = Convert.ToInt32(response.Substring(1, 2));
-				return ((TargetSignals)signal).ToStopSignal();
-			} else {
-				throw new FormatException("Unexpected response");
-			}
+			return stopSignal.Signal;
 		}
 	}
 }

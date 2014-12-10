@@ -141,7 +141,14 @@ namespace UnitTests
 			StopSignal reason = this.client.AskHaltedReason();
 			this.Read();
 
-			Assert.AreEqual(StopSignal.HostBreak, reason);
+			Assert.IsTrue(reason.HasFlag(StopSignal.HostBreak));
+		}
+
+		[Test]
+		public void AshHaltedReasonInvalidReply()
+		{
+			this.SendPacket("OK", "");
+			Assert.Throws<ProtocolViolationException>(() => this.client.AskHaltedReason());
 		}
 	}
 }

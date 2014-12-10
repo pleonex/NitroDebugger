@@ -1,5 +1,5 @@
 ﻿//
-//  ReplyPacketFactory.cs
+//  StopSignalReply.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -19,21 +19,20 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using NitroDebugger.RSP.Packets;
+using NitroDebugger.RSP;
 
-namespace NitroDebugger.RSP
+namespace NitroDebugger.RSP.Packets
 {
-	public static class ReplyPacketFactory
+	public class StopSignalReply : ReplyPacket
 	{
-		public static ReplyPacket CreateReplyPacket(string data)
+		public StopSignalReply(int signal)
 		{
-			if (data == "OK")
-				return new OkReply();
+			this.Signal = ((TargetSignals)signal).ToStopSignal();
+		}
 
-			if (data.Length == 3 && data[0] == 'S')
-				return new StopSignalReply(Convert.ToInt32(data.Substring(1)));
-
-			throw new NotSupportedException("Unsupported reply");
+		public StopSignal Signal {
+			get;
+			private set;
 		}
 	}
 }
