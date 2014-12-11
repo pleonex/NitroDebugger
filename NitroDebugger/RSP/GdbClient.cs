@@ -40,8 +40,7 @@ namespace NitroDebugger.RSP
 	public class GdbClient
 	{
 		private Presentation presentation;
-		private CancellationTokenSource cts;
-		private Task<StopSignal> currentTask;
+		private Task currentTask;
 
 		public GdbClient(string host, int port)
 		{
@@ -107,15 +106,10 @@ namespace NitroDebugger.RSP
 		public bool StopExecution()
 		{
 			// Stop any pending continue / step asyn task
-			if (this.cts != null) {
-				try { 
-					this.cts.Cancel();
-					currentTask.Wait();
-				} catch (AggregateException) { }
+			if (this.currentTask != null) {
+				this.presentation.CancelRead(this.currentTask);
+				this.currentTask = null;
 			}
-
-			this.cts = new CancellationTokenSource();
-			this.presentation.CancellationToken = this.cts;
 
 			ReplyPacket response = this.SafeInterruption();
 			if (response == null)
@@ -130,32 +124,24 @@ namespace NitroDebugger.RSP
 			return this.SendCommandWithSignal(command);
 		}
 
-		public async Task ContinueExecution()
+		public void ContinueExecution()
 		{
-			this.cts = new CancellationTokenSource();
-			this.presentation.CancellationToken = this.cts;
 			ContinueCommand cont = new ContinueCommand();
-
-			StopSignal signal = await this.SendCommandWithSignalAsync(cont);
-			if (!this.cts.IsCancellationRequested)
-				OnBreakExecution(signal);
+			this.SendCommandWithSignalAsync(cont);
 		}
 
-		public async Task StepInto()
+		public void StepInto()
 		{
-			this.cts = new CancellationTokenSource();
-			this.presentation.CancellationToken = this.cts;
 			SingleStep step = new SingleStep();
-
-			StopSignal signal = await this.SendCommandWithSignalAsync(step);
-			if (!this.cts.IsCancellationRequested)
-				OnBreakExecution(signal);
+			this.SendCommandWithSignalAsync(step);
 		}
 
-		private Task<StopSignal> SendCommandWithSignalAsync(CommandPacket cmd)
+		private void SendCommandWithSignalAsync(CommandPacket cmd)
 		{
-			currentTask = Task.Run(() => SendCommandWithSignal(cmd));
-			return currentTask;
+			this.currentTask = Task.Run(() => {
+				StopSignal signal = SendCommandWithSignal(cmd);
+				OnBreakExecution(signal);
+			});
 		}
 
 		private StopSignal SendCommandWithSignal(CommandPacket cmd)

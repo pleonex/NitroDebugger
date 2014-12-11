@@ -50,6 +50,11 @@ namespace NitroDebugger.RSP
 			}
 		}
 
+		public CancellationToken Cancellation {
+			get;
+			set;
+		}
+
 		public void Close()
 		{
 			if (this.IsConnected)
@@ -77,20 +82,23 @@ namespace NitroDebugger.RSP
 			if (!this.IsConnected)
 				throw new SocketException();
 
-			while (this.buffer.Count == 0)
-				this.UpdateBuffer().Wait();
+			while (this.buffer.Count == 0) {
+				this.Cancellation.ThrowIfCancellationRequested();
+				this.UpdateBuffer();
+			}
 
 			return this.buffer.Dequeue();
 		}
 
-		public byte[] ReadPacket(byte separator, CancellationTokenSource cts = null)
+		public byte[] ReadPacket(byte separator)
 		{
 			if (!this.IsConnected)
 				throw new SocketException();
 
-			do
-				this.UpdateBuffer(cts).Wait();
-			while (this.buffer.Count == 0);
+			do {
+				this.Cancellation.ThrowIfCancellationRequested();
+				this.UpdateBuffer();
+			} while (this.buffer.Count == 0);
 
 			return this.GetPacket(separator);
 		}
@@ -106,21 +114,14 @@ namespace NitroDebugger.RSP
 			return packet.ToArray();
 		}
 
-		private async Task UpdateBuffer(CancellationTokenSource cts = null)
+		private void UpdateBuffer()
 		{
 			byte[] buffer = new byte[1024];
 			while (this.stream.DataAvailable) {
-				int read;
-				if (cts == null)
-					read = this.stream.Read(buffer, 0, buffer.Length);
-				else
-					read = await this.stream.ReadAsync(buffer, 0, buffer.Length, cts.Token);
+				int read = this.stream.Read(buffer, 0, buffer.Length);;
 				for (int i = 0; i < read; i++)
 					this.buffer.Enqueue(buffer[i]);
 			}
-
-			if (cts != null)
-				cts.Token.ThrowIfCancellationRequested();
 		}
 	}
 }

@@ -22,6 +22,7 @@ using System;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NitroDebugger.RSP
 {
@@ -34,15 +35,12 @@ namespace NitroDebugger.RSP
 		private const byte PacketSeparator = 0x24;	// '$'
 
 		private Session session;
+		private CancellationTokenSource cts;
 
 		public Presentation(string hostname, int port)
 		{
 			this.session = new Session(hostname, port);
-		}
-
-		public CancellationTokenSource CancellationToken {
-			get;
-			set;
+			this.ResetCancellationToken();
 		}
 
 		public void Close()
@@ -102,7 +100,7 @@ namespace NitroDebugger.RSP
 			ReplyPacket response = null;
 			try {
 				// Get data
-				byte[] packet = this.session.ReadPacket(PacketSeparator, CancellationToken);
+				byte[] packet = this.session.ReadPacket(PacketSeparator);
 				response = PacketBinConverter.FromBinary(packet);
 
 				// Send ACK
@@ -113,6 +111,24 @@ namespace NitroDebugger.RSP
 			}
 
 			return response;
+		}
+
+		public void CancelRead(Task taskToCancell)
+		{
+			try {
+				this.cts.Cancel();
+				taskToCancell.Wait(this.cts.Token);
+			} catch (OperationCanceledException) {
+			} catch (AggregateException) {
+			}
+
+			this.ResetCancellationToken();
+		}
+
+		private void ResetCancellationToken()
+		{
+			this.cts = new CancellationTokenSource();
+			this.session.Cancellation = this.cts.Token;
 		}
 	}
 }
