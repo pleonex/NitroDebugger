@@ -31,7 +31,7 @@ namespace NitroDebugger.RSP
 				return new OkReply();
 
 			if (data.Length == 3 && data[0] == 'S')
-				return new StopSignalReply(Convert.ToInt32(data.Substring(1)));
+				return new StopSignalReply(Convert.ToInt32(data.Substring(1), 16));
 
 			throw new FormatException("Unknown reply");
 		}
