@@ -24,10 +24,13 @@ using System.Net.Sockets;
 using NitroDebugger.RSP.Packets;
 using System.Net;
 using NitroDebugger;
+using System.Threading.Tasks;
 
 namespace NitroDebugger.RSP
 {
 	public delegate void LostConnectionEventHandle(object sender, EventArgs e);
+
+	public delegate void BreakExecutionEventHandle(object sender, StopSignal signal);
 
 	/// <summary>
 	/// GDB Client. Direct connection to emulator.
@@ -60,12 +63,20 @@ namespace NitroDebugger.RSP
 
 		public event LostConnectionEventHandle LostConnection;
 
+		public event BreakExecutionEventHandle BreakExecution;
+
 		private void OnLostConnection(EventArgs e)
 		{
 			this.IsConnected = false;
 
 			if (LostConnection != null)
 				LostConnection(this, e);
+		}
+
+		private void OnBreakExecution(StopSignal signal)
+		{
+			if (BreakExecution != null)
+				BreakExecution(this, signal);
 		}
 
 		public void Connect()
@@ -90,16 +101,6 @@ namespace NitroDebugger.RSP
 			this.IsConnected = false;
 		}
 
-		public StopSignal AskHaltedReason()
-		{
-			HaltedReasonCommand command = new HaltedReasonCommand();
-			ReplyPacket response = this.SafeSending(command, typeof(StopSignalReply));
-			if (response == null)
-				return StopSignal.Unknown;
-
-			return ((StopSignalReply)response).Signal;
-		}
-
 		public bool StopExecution()
 		{
 			ReplyPacket response = this.SafeInterruption();
@@ -109,16 +110,38 @@ namespace NitroDebugger.RSP
 			return ((StopSignalReply)response).Signal.HasFlag(StopSignal.HostBreak);
 		}
 
-		public void ContinueExecution()
+		public StopSignal AskHaltedReason()
 		{
-			ContinueCommand cont = new ContinueCommand();
-			this.SafeSending(cont);
+			HaltedReasonCommand command = new HaltedReasonCommand();
+			return this.SendCommandWithSignal(command);
 		}
 
-		public void StepInto()
+		public async Task ContinueExecution()
+		{
+			ContinueCommand cont = new ContinueCommand();
+			StopSignal signal = await this.SendCommandWithSignalAsync(cont);
+			OnBreakExecution(signal);
+		}
+
+		public async Task StepInto()
 		{
 			SingleStep step = new SingleStep();
-			this.SafeSending(step);
+			StopSignal signal = await this.SendCommandWithSignalAsync(step);
+			OnBreakExecution(signal);
+		}
+
+		private Task<StopSignal> SendCommandWithSignalAsync(CommandPacket cmd)
+		{
+			return Task.Run(() => SendCommandWithSignal(cmd));
+		}
+
+		private StopSignal SendCommandWithSignal(CommandPacket cmd)
+		{
+			ReplyPacket response = this.SafeSending(cmd, typeof(StopSignalReply));
+			if (response == null)
+				return StopSignal.Unknown;
+
+			return ((StopSignalReply)response).Signal;
 		}
 
 		private ReplyPacket SafeInterruption()

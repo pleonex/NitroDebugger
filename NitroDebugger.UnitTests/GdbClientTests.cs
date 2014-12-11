@@ -221,6 +221,14 @@ namespace UnitTests
 			Assert.IsFalse(stopped);
 		}
 
+		private string Read()
+		{
+			Thread.Sleep(50);
+			byte[] buffer = new byte[10 * 1024];
+			int read = this.serverStream.Read(buffer, 0, buffer.Length);
+			return Encoding.ASCII.GetString(buffer, 0, read);
+		}
+
 		[Test]
 		public void AskHaltedReason()
 		{
@@ -237,16 +245,22 @@ namespace UnitTests
 		{
 			this.serverStream.WriteByte(RawPacket.Ack);
 			this.client.ContinueExecution();
+
 			string rcv = this.Read();
 			Assert.AreEqual("c", rcv.Substring(1, rcv.Length - 4));
 		}
 
-		private string Read()
+		[Test]
+		public void ContinueExecutionAsync()
 		{
-			Thread.Sleep(50);
-			byte[] buffer = new byte[10 * 1024];
-			int read = this.serverStream.Read(buffer, 0, buffer.Length);
-			return Encoding.ASCII.GetString(buffer, 0, read);
+			this.client.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
+			this.client.ContinueExecution();
+			this.SendPacket("S", "05");
+		}
+
+		private void BreakpointExecution(object sender, StopSignal signal)
+		{
+			Assert.IsTrue(signal.HasFlag(StopSignal.Breakpoint));
 		}
 
 		[Test]
@@ -254,8 +268,17 @@ namespace UnitTests
 		{
 			this.serverStream.WriteByte(RawPacket.Ack);
 			this.client.StepInto();
+
 			string rcv = this.Read();
 			Assert.AreEqual("s", rcv.Substring(1, rcv.Length - 4));
+		}
+
+		[Test]
+		public void StepIntoAsync()
+		{
+			this.client.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
+			this.client.StepInto();
+			this.SendPacket("S", "05");
 		}
 	}
 }
