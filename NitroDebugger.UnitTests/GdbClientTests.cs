@@ -255,11 +255,18 @@ namespace UnitTests
 		{
 			this.client.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
 			this.client.ContinueExecution();
+
+			string rcv = this.Read();
+			Assert.AreEqual("c", rcv.Substring(1, rcv.Length - 4));
+
 			this.SendPacket("S", "05");
 		}
 
 		private void BreakpointExecution(object sender, StopSignal signal)
 		{
+			Assert.AreEqual(RawPacket.Ack, this.serverStream.ReadByte());
+			Assert.AreEqual(0, this.serverClient.Available);
+
 			Assert.IsTrue(signal.HasFlag(StopSignal.Breakpoint));
 		}
 
@@ -278,6 +285,10 @@ namespace UnitTests
 		{
 			this.client.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
 			this.client.StepInto();
+
+			string rcv = this.Read();
+			Assert.AreEqual("s", rcv.Substring(1, rcv.Length - 4));
+
 			this.SendPacket("S", "05");
 		}
 	}
