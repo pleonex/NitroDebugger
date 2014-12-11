@@ -19,15 +19,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using NUnit.Framework;
-using NitroDebugger.RSP;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Moq;
 using Moq.Protected;
+using NUnit.Framework;
 using NitroDebugger;
-using System.Threading;
-using System.Text;
+using NitroDebugger.RSP;
 
 namespace UnitTests
 {
@@ -290,6 +291,27 @@ namespace UnitTests
 			Assert.AreEqual("s", rcv.Substring(1, rcv.Length - 4));
 
 			this.SendPacket("S", "05");
+		}
+
+		[Test]
+		public void ContinueIsInterrupted()
+		{
+			this.client.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
+
+			this.client.ContinueExecution();
+			string rcv = this.Read();
+			Assert.AreEqual("c", rcv.Substring(1, rcv.Length - 4));
+			this.serverStream.WriteByte(RawPacket.Ack);
+
+			Task.Run(() => {
+				while (this.serverStream.ReadByte() != 0x03) ;
+				this.SendPacket("S", "02");
+			});
+
+			this.client.StopExecution();
+
+			Assert.AreEqual(RawPacket.Ack, this.serverStream.ReadByte());
+			Assert.AreEqual(0, this.serverClient.Available);
 		}
 	}
 }

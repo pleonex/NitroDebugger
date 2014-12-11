@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NitroDebugger.RSP
 {
@@ -76,18 +78,18 @@ namespace NitroDebugger.RSP
 				throw new SocketException();
 
 			while (this.buffer.Count == 0)
-				this.UpdateBuffer();
+				this.UpdateBuffer().Wait();
 
 			return this.buffer.Dequeue();
 		}
 
-		public byte[] ReadPacket(byte separator)
+		public byte[] ReadPacket(byte separator, CancellationTokenSource cts = null)
 		{
 			if (!this.IsConnected)
 				throw new SocketException();
 
 			do
-				this.UpdateBuffer();
+				this.UpdateBuffer(cts).Wait();
 			while (this.buffer.Count == 0);
 
 			return this.GetPacket(separator);
@@ -104,14 +106,21 @@ namespace NitroDebugger.RSP
 			return packet.ToArray();
 		}
 
-		private void UpdateBuffer()
+		private async Task UpdateBuffer(CancellationTokenSource cts = null)
 		{
 			byte[] buffer = new byte[1024];
 			while (this.stream.DataAvailable) {
-				int read = this.stream.Read(buffer, 0, buffer.Length);
+				int read;
+				if (cts == null)
+					read = this.stream.Read(buffer, 0, buffer.Length);
+				else
+					read = await this.stream.ReadAsync(buffer, 0, buffer.Length, cts.Token);
 				for (int i = 0; i < read; i++)
 					this.buffer.Enqueue(buffer[i]);
 			}
+
+			if (cts != null)
+				cts.Token.ThrowIfCancellationRequested();
 		}
 	}
 }

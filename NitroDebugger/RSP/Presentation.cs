@@ -21,6 +21,7 @@
 using System;
 using System.Net.Sockets;
 using System.Net;
+using System.Threading;
 
 namespace NitroDebugger.RSP
 {
@@ -37,6 +38,11 @@ namespace NitroDebugger.RSP
 		public Presentation(string hostname, int port)
 		{
 			this.session = new Session(hostname, port);
+		}
+
+		public CancellationTokenSource CancellationToken {
+			get;
+			set;
 		}
 
 		public void Close()
@@ -70,6 +76,11 @@ namespace NitroDebugger.RSP
 			return this.ReceiveReply();
 		}
 
+		public void SendNack()
+		{
+			this.session.Write(RawPacket.Nack);
+		}
+
 		public ReplyPacket ReceiveReply()
 		{
 			ReplyPacket response = null;
@@ -91,7 +102,7 @@ namespace NitroDebugger.RSP
 			ReplyPacket response = null;
 			try {
 				// Get data
-				byte[] packet = this.session.ReadPacket(PacketSeparator);
+				byte[] packet = this.session.ReadPacket(PacketSeparator, CancellationToken);
 				response = PacketBinConverter.FromBinary(packet);
 
 				// Send ACK

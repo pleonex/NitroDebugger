@@ -20,11 +20,12 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Linq;
-using System.Net.Sockets;
-using NitroDebugger.RSP.Packets;
 using System.Net;
-using NitroDebugger;
+using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
+using NitroDebugger;
+using NitroDebugger.RSP.Packets;
 
 namespace NitroDebugger.RSP
 {
@@ -39,6 +40,8 @@ namespace NitroDebugger.RSP
 	public class GdbClient
 	{
 		private Presentation presentation;
+		private CancellationTokenSource cts;
+		private Task<StopSignal> currentTask;
 
 		public GdbClient(string host, int port)
 		{
@@ -103,6 +106,17 @@ namespace NitroDebugger.RSP
 
 		public bool StopExecution()
 		{
+			// Stop any pending continue / step asyn task
+			if (this.cts != null) {
+				try { 
+					this.cts.Cancel();
+					currentTask.Wait();
+				} catch (AggregateException) { }
+			}
+
+			this.cts = new CancellationTokenSource();
+			this.presentation.CancellationToken = this.cts;
+
 			ReplyPacket response = this.SafeInterruption();
 			if (response == null)
 				return false;
@@ -118,21 +132,30 @@ namespace NitroDebugger.RSP
 
 		public async Task ContinueExecution()
 		{
+			this.cts = new CancellationTokenSource();
+			this.presentation.CancellationToken = this.cts;
 			ContinueCommand cont = new ContinueCommand();
+
 			StopSignal signal = await this.SendCommandWithSignalAsync(cont);
-			OnBreakExecution(signal);
+			if (!this.cts.IsCancellationRequested)
+				OnBreakExecution(signal);
 		}
 
 		public async Task StepInto()
 		{
+			this.cts = new CancellationTokenSource();
+			this.presentation.CancellationToken = this.cts;
 			SingleStep step = new SingleStep();
+
 			StopSignal signal = await this.SendCommandWithSignalAsync(step);
-			OnBreakExecution(signal);
+			if (!this.cts.IsCancellationRequested)
+				OnBreakExecution(signal);
 		}
 
 		private Task<StopSignal> SendCommandWithSignalAsync(CommandPacket cmd)
 		{
-			return Task.Run(() => SendCommandWithSignal(cmd));
+			currentTask = Task.Run(() => SendCommandWithSignal(cmd));
+			return currentTask;
 		}
 
 		private StopSignal SendCommandWithSignal(CommandPacket cmd)
