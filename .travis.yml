@@ -1,16 +1,11 @@
 ## Travis CI Integration
-language: c
+language: csharp
+solution: NitroDebugger.sln
 
-install:
-  - sudo add-apt-repository ppa:directhex/monoxide -y && sudo apt-get update
-  - sudo apt-get install mono-devel mono-gmcs nunit-console
-  - wget http://nuget.org/nuget.exe -O ./.nuget/NuGet.exe
-  - chmod a+x ./.nuget/NuGet.exe
-  - mozroots --import --sync
+# In this way it does not override install
+after_install:
+  - sudo apt-get install nunit-console
+
 script:
   - xbuild NitroDebugger.sln
   - nunit-console NitroDebugger.UnitTests/bin/Debug/NitroDebugger.UnitTests.dll
-
-env:
- global:
-  - EnableNuGetPackageRestore=true
