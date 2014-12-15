@@ -346,6 +346,22 @@ namespace UnitTests
 			Assert.AreEqual(expected, actual);
 			Assert.AreEqual(3, this.client.ErrorCode);
 		}
+
+		[Test]
+		public void WriteMemoryGood()
+		{
+			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE, 0xBE, 0x00, 0x10, 0x20, 0x39 };
+			uint address = 0x02000800;
+			int size = 8;
+
+			this.SendPacket("OK", "");
+			this.client.WriteMemory(address, size, expected);
+			Assert.AreEqual(0, this.client.ErrorCode);
+
+			string rcv = this.Read();
+			string dataString = BitConverter.ToString(expected).Replace("-", "");
+			Assert.AreEqual("M2000800,8:" + dataString, rcv.Substring(1, rcv.Length - 5));
+		}
 	}
 }
 

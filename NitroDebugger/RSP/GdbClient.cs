@@ -140,6 +140,12 @@ namespace NitroDebugger.RSP
 			return reply.GetData();
 		}
 
+		public void WriteMemory(uint address, int size, byte[] data)
+		{
+			WriteMemoryCommand command = new WriteMemoryCommand(address, size, data);
+			this.SendCommandWithoutErrorReply<OkReply>(command);
+		}
+
 		private T SendCommandWithoutErrorReply<T>(CommandPacket command)
 			where T : ReplyPacket
 		{
