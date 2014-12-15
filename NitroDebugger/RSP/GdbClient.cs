@@ -124,6 +124,16 @@ namespace NitroDebugger.RSP
 			return this.SendCommandWithSignal(command);
 		}
 
+		public byte[] ReadMemory(uint address, int size)
+		{
+			ReadMemoryCommand command = new ReadMemoryCommand(address, size);
+			ReplyPacket reply = this.SafeSending(command, typeof(DataReply));
+			if (reply == null)
+				return new byte[0];
+
+			return ((DataReply)reply).GetData();
+		}
+
 		public void ContinueExecution()
 		{
 			ContinueCommand cont = new ContinueCommand();

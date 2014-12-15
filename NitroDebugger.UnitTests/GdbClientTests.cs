@@ -313,6 +313,21 @@ namespace UnitTests
 			Assert.AreEqual(RawPacket.Ack, this.serverStream.ReadByte());
 			Assert.AreEqual(0, this.serverClient.Available);
 		}
+
+		[Test]
+		public void ReadMemoryGood()
+		{
+			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE, 0xBE, 0x00, 0x10, 0x20, 0x39 };
+			uint address = 0x02000800;
+			int size = 8;
+
+			this.SendPacket("", BitConverter.ToString(expected).Replace("-", ""));
+			byte[] actual = this.client.ReadMemory(address, size);
+			Assert.AreEqual(expected, actual);
+
+			string rcv = this.Read();
+			Assert.AreEqual("m2000800,8", rcv.Substring(1, rcv.Length - 5));
+		}
 	}
 }
 
