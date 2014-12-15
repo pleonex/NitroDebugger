@@ -191,15 +191,15 @@ namespace UnitTests
 		[Test]
 		public void CreateErrorReply()
 		{
-			int expected = 0x3;
+			int expected = 3;
 			ErrorReply reply = new ErrorReply(expected);
-			Assert.AreEqual(expected, reply.Error);
+			Assert.AreEqual(ErrorCode.ReadMemoryError, reply.Error);
 		}
 
 		[Test]
 		public void FactoryErrorReply()
 		{
-			int expected = 0x3;
+			ErrorCode expected = ErrorCode.ReadMemoryError;
 			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket("E03");
 
 			Assert.IsInstanceOf<ErrorReply>(reply);

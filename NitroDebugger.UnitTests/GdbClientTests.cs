@@ -141,7 +141,7 @@ namespace UnitTests
 			StopSignal reason = this.client.AskHaltedReason();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
-			Assert.AreEqual(0xFF, this.client.ErrorCode);
+			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
 		}
 
 		[Test]
@@ -151,7 +151,7 @@ namespace UnitTests
 			StopSignal reason = this.client.AskHaltedReason();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
-			Assert.AreEqual(0xFF, this.client.ErrorCode);
+			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
 		}
 
 		[Test]
@@ -166,7 +166,7 @@ namespace UnitTests
 		{
 			this.client.LostConnection -= new LostConnectionEventHandle(LostConnection);
 			Assert.IsFalse(this.client.IsConnected);
-			Assert.AreEqual(0xFF, this.client.ErrorCode);
+			Assert.AreEqual(ErrorCode.NetworkError, this.client.Error);
 		}
 
 		[Test]
@@ -205,7 +205,7 @@ namespace UnitTests
 			bool stopped = this.client.StopExecution();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.IsFalse(stopped);
-			Assert.AreEqual(0xFF, this.client.ErrorCode);
+			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
 		}
 
 		[Test]
@@ -215,7 +215,7 @@ namespace UnitTests
 			bool stopped = this.client.StopExecution();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.IsFalse(stopped);
-			Assert.AreEqual(0xFF, this.client.ErrorCode);
+			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
 		}
 
 		[Test]
@@ -329,6 +329,7 @@ namespace UnitTests
 			this.SendPacket("", BitConverter.ToString(expected).Replace("-", ""));
 			byte[] actual = this.client.ReadMemory(address, size);
 			Assert.AreEqual(expected, actual);
+			Assert.AreEqual(ErrorCode.NoError, this.client.Error);
 
 			string rcv = this.Read();
 			Assert.AreEqual("m2000800,8", rcv.Substring(1, rcv.Length - 5));
@@ -344,7 +345,7 @@ namespace UnitTests
 			this.SendPacket("E", "03");
 			byte[] actual = this.client.ReadMemory(address, size);
 			Assert.AreEqual(expected, actual);
-			Assert.AreEqual(3, this.client.ErrorCode);
+			Assert.AreEqual(ErrorCode.ReadMemoryError, this.client.Error);
 		}
 
 		[Test]
@@ -356,7 +357,7 @@ namespace UnitTests
 
 			this.SendPacket("OK", "");
 			this.client.WriteMemory(address, size, expected);
-			Assert.AreEqual(0, this.client.ErrorCode);
+			Assert.AreEqual(ErrorCode.NoError, this.client.Error);
 
 			string rcv = this.Read();
 			string dataString = BitConverter.ToString(expected).Replace("-", "");

@@ -44,9 +44,9 @@ namespace NitroDebugger.RSP
 
 		public GdbClient(string host, int port)
 		{
-			this.Host = host;
-			this.Port = port;
-			this.ErrorCode = 0;
+			this.Host  = host;
+			this.Port  = port;
+			this.Error = ErrorCode.NoError;
 		}
 
 		public string Host {
@@ -64,7 +64,7 @@ namespace NitroDebugger.RSP
 			private set;
 		}
 
-		public int ErrorCode {
+		public ErrorCode Error {
 			get;
 			private set;
 		}
@@ -155,7 +155,7 @@ namespace NitroDebugger.RSP
 
 			ErrorReply error = reply as ErrorReply;
 			if (error != null) {
-				this.ErrorCode = error.Error;
+				this.Error = error.Error;
 				return null;
 			}
 
@@ -193,22 +193,21 @@ namespace NitroDebugger.RSP
 
 		private ReplyPacket SafeInterruption()
 		{
-			this.ErrorCode = 0;
-
+			this.Error = ErrorCode.NoError;
 			ReplyPacket response = null;
-			bool error = false;
+
 			try {
 				response = this.presentation.SendInterrupt();
 			} catch (SocketException) {
-				error = true;
+				this.Error = ErrorCode.NetworkError;
 			} catch (ProtocolViolationException) {
-				error = true;
+				this.Error = ErrorCode.ProtocolError;
 			}
 
 			if (response != null && !(response is StopSignalReply))
-				error = true;
+				this.Error = ErrorCode.ProtocolError;
 
-			if (error) {
+			if (this.Error != ErrorCode.NoError) {
 				NetworkError();
 				response = null;
 			}
@@ -218,8 +217,8 @@ namespace NitroDebugger.RSP
 
 		private ReplyPacket SafeSending(CommandPacket command, params Type[] validReplyTypes)
 		{
+			this.Error = ErrorCode.NoError;
 			ReplyPacket response = null;
-			bool error = false;
 
 			try {
 				this.presentation.SendCommand(command);
@@ -227,15 +226,15 @@ namespace NitroDebugger.RSP
 				if (validReplyTypes.Length > 0)
 					response = this.presentation.ReceiveReply();
 			} catch (SocketException) {
-				error = true;
+				this.Error = ErrorCode.NetworkError;
 			} catch (ProtocolViolationException) {
-				error = true;
+				this.Error = ErrorCode.ProtocolError;
 			}
 
 			if (response != null && !ValidateType(response, validReplyTypes))
-				error = true;
+				this.Error = ErrorCode.ProtocolError;
 
-			if (error) {
+			if (this.Error != ErrorCode.NoError) {
 				NetworkError();
 				response = null;
 			}
@@ -250,7 +249,6 @@ namespace NitroDebugger.RSP
 
 		private void NetworkError()
 		{
-			this.ErrorCode = 0xFF;
 			this.Disconnect();
 			OnLostConnection(EventArgs.Empty);
 		}

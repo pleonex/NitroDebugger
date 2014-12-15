@@ -1,5 +1,5 @@
 ﻿//
-//  ErrorReply.cs
+//  ErrorCode.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -20,19 +20,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 
-namespace NitroDebugger.RSP.Packets
+namespace NitroDebugger
 {
-	public class ErrorReply : ReplyPacket
+	public enum ErrorCode : byte
 	{
-		public ErrorReply(int errorCode)
-		{
-			this.Error = (ErrorCode)errorCode;
-		}
+		NoError = 0,
 
-		public ErrorCode Error {
-			get;
-			private set;
-		}
+		// Defined in DeSmuME
+		PacketFormatError = 1,
+		WriteMemoryFormatError = 2,
+		ReadMemoryError = 3,
+
+		// My own erros
+		ProtocolError = 0xFE,
+		NetworkError = 0xFF
 	}
 }
 
