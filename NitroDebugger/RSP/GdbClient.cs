@@ -46,6 +46,7 @@ namespace NitroDebugger.RSP
 		{
 			this.Host = host;
 			this.Port = port;
+			this.ErrorCode = 0;
 		}
 
 		public string Host {
@@ -59,6 +60,11 @@ namespace NitroDebugger.RSP
 		}
 
 		public bool IsConnected {
+			get;
+			private set;
+		}
+
+		public int ErrorCode {
 			get;
 			private set;
 		}
@@ -127,11 +133,27 @@ namespace NitroDebugger.RSP
 		public byte[] ReadMemory(uint address, int size)
 		{
 			ReadMemoryCommand command = new ReadMemoryCommand(address, size);
-			ReplyPacket reply = this.SafeSending(command, typeof(DataReply));
+			DataReply reply = this.SendCommandWithoutErrorReply<DataReply>(command);
 			if (reply == null)
 				return new byte[0];
 
-			return ((DataReply)reply).GetData();
+			return reply.GetData();
+		}
+
+		private T SendCommandWithoutErrorReply<T>(CommandPacket command)
+			where T : ReplyPacket
+		{
+			ReplyPacket reply = this.SafeSending(command, typeof(T), typeof(ErrorReply));
+			if (reply == null)
+				return null;
+
+			ErrorReply error = reply as ErrorReply;
+			if (error != null) {
+				this.ErrorCode = error.Error;
+				return null;
+			}
+
+			return reply as T;
 		}
 
 		public void ContinueExecution()
@@ -165,6 +187,8 @@ namespace NitroDebugger.RSP
 
 		private ReplyPacket SafeInterruption()
 		{
+			this.ErrorCode = 0;
+
 			ReplyPacket response = null;
 			bool error = false;
 			try {
@@ -179,6 +203,7 @@ namespace NitroDebugger.RSP
 				error = true;
 
 			if (error) {
+				this.ErrorCode = 0xFF;
 				NetworkError();
 				response = null;
 			}

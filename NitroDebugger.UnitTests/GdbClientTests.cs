@@ -328,6 +328,19 @@ namespace UnitTests
 			string rcv = this.Read();
 			Assert.AreEqual("m2000800,8", rcv.Substring(1, rcv.Length - 5));
 		}
+			
+		[Test]
+		public void ReadMemoryErrorReading()
+		{
+			byte[] expected = new byte[0];
+			uint address = 0x02000800;
+			int size = 8;
+
+			this.SendPacket("E", "03");
+			byte[] actual = this.client.ReadMemory(address, size);
+			Assert.AreEqual(expected, actual);
+			Assert.AreEqual(3, this.client.ErrorCode);
+		}
 	}
 }
 
