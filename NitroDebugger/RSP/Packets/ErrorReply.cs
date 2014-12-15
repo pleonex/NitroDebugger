@@ -1,5 +1,5 @@
 ﻿//
-//  ReplyPacketFactory.cs
+//  ErrorReply.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -19,34 +19,19 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Linq;
-using NitroDebugger.RSP.Packets;
 
-namespace NitroDebugger.RSP
+namespace NitroDebugger.RSP.Packets
 {
-	public static class ReplyPacketFactory
+	public class ErrorReply : ReplyPacket
 	{
-		public static ReplyPacket CreateReplyPacket(string data)
+		public ErrorReply(int errorCode)
 		{
-			if (data == "OK")
-				return new OkReply();
+			this.Error = errorCode;
+		}
 
-			if (data.Length == 3 && data[0] == 'S')
-				return new StopSignalReply(Convert.ToInt32(data.Substring(1), 16));
-
-			if (data.Length == 3 && data[0] == 'E')
-				return new ErrorReply(Convert.ToInt32(data.Substring(1), 16));
-
-			if (data.Length % 2 == 0) {
-				try {
-					byte[] dataBytes = Enumerable.Range(0, data.Length / 2)
-						.Select(i => data.Substring(i * 2, 2))
-						.Select(b => Convert.ToByte(b, 16)).ToArray();
-					return new DataReply(dataBytes);
-				} catch (FormatException) { }
-			}
-
-			throw new FormatException("Unknown reply");
+		public int Error {
+			get;
+			private set;
 		}
 	}
 }

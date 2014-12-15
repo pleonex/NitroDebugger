@@ -187,6 +187,24 @@ namespace UnitTests
 			Assert.IsInstanceOf<DataReply>(reply);
 			Assert.AreEqual(expected, ((DataReply)reply).GetData());
 		}
+
+		[Test]
+		public void CreateErrorReply()
+		{
+			int expected = 0x3;
+			ErrorReply reply = new ErrorReply(expected);
+			Assert.AreEqual(expected, reply.Error);
+		}
+
+		[Test]
+		public void FactoryErrorReply()
+		{
+			int expected = 0x3;
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket("E03");
+
+			Assert.IsInstanceOf<ErrorReply>(reply);
+			Assert.AreEqual(expected, ((ErrorReply)reply).Error);
+		}
 	}
 }
 

@@ -55,6 +55,7 @@
     <Compile Include="RSP\Packets\SingleStep.cs" />
     <Compile Include="RSP\Packets\ReadMemoryCommand.cs" />
     <Compile Include="RSP\Packets\DataReply.cs" />
+    <Compile Include="RSP\Packets\ErrorReply.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
