@@ -155,6 +155,18 @@ namespace UnitTests
 			Assert.AreEqual("s", cmd.Command);
 			Assert.AreEqual("s", cmd.Pack());
 		}
+
+		[Test]
+		public void CreateReadMemoryCommand()
+		{
+			uint address = 0x02000800;
+			int size = 8;
+			ReadMemoryCommand cmd = new ReadMemoryCommand(address, size);
+			Assert.AreEqual(address, cmd.Address);
+			Assert.AreEqual(size, cmd.Size);
+			Assert.AreEqual("m", cmd.Command);
+			Assert.AreEqual("m2000800,8", cmd.Pack());
+		}
 	}
 }
 
