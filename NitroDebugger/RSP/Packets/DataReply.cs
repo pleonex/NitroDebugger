@@ -28,7 +28,7 @@ namespace NitroDebugger.RSP.Packets
 
 		public DataReply(byte[] data)
 		{
-			this.data = data;
+			this.data = (byte[])data.Clone();
 		}
 
 		public byte[] GetData()
