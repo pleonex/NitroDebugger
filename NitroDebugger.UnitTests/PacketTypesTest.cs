@@ -205,6 +205,22 @@ namespace UnitTests
 			Assert.IsInstanceOf<ErrorReply>(reply);
 			Assert.AreEqual(expected, ((ErrorReply)reply).Error);
 		}
+
+		[Test]
+		public void CreateWriteMemoryCommand()
+		{
+			uint address = 0x02000800;
+			int size = 8;
+			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE, 0xBE, 0x00, 0x10, 0x20, 0x39 };
+			string dataString = BitConverter.ToString(expected).Replace("-", "");
+
+			WriteMemoryCommand cmd = new WriteMemoryCommand(address, size, expected);
+			Assert.AreEqual(address, cmd.Address);
+			Assert.AreEqual(size, cmd.Size);
+			Assert.AreEqual(expected, cmd.GetData());
+			Assert.AreEqual("M", cmd.Command);
+			Assert.AreEqual("M2000800,8:" + dataString, cmd.Pack());
+		}
 	}
 }
 
