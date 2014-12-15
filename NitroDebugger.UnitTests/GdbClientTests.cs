@@ -141,6 +141,7 @@ namespace UnitTests
 			StopSignal reason = this.client.AskHaltedReason();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
+			Assert.AreEqual(0xFF, this.client.ErrorCode);
 		}
 
 		[Test]
@@ -150,6 +151,7 @@ namespace UnitTests
 			StopSignal reason = this.client.AskHaltedReason();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
+			Assert.AreEqual(0xFF, this.client.ErrorCode);
 		}
 
 		[Test]
@@ -163,7 +165,8 @@ namespace UnitTests
 		private void LostConnection(object sender, EventArgs e)
 		{
 			this.client.LostConnection -= new LostConnectionEventHandle(LostConnection);
-			Assert.IsTrue(!this.client.IsConnected);
+			Assert.IsFalse(this.client.IsConnected);
+			Assert.AreEqual(0xFF, this.client.ErrorCode);
 		}
 
 		[Test]
@@ -202,6 +205,7 @@ namespace UnitTests
 			bool stopped = this.client.StopExecution();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.IsFalse(stopped);
+			Assert.AreEqual(0xFF, this.client.ErrorCode);
 		}
 
 		[Test]
@@ -211,6 +215,7 @@ namespace UnitTests
 			bool stopped = this.client.StopExecution();
 			Assert.IsFalse(this.client.IsConnected);
 			Assert.IsFalse(stopped);
+			Assert.AreEqual(0xFF, this.client.ErrorCode);
 		}
 
 		[Test]

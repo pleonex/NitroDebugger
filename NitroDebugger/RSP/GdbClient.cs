@@ -203,7 +203,6 @@ namespace NitroDebugger.RSP
 				error = true;
 
 			if (error) {
-				this.ErrorCode = 0xFF;
 				NetworkError();
 				response = null;
 			}
@@ -245,6 +244,7 @@ namespace NitroDebugger.RSP
 
 		private void NetworkError()
 		{
+			this.ErrorCode = 0xFF;
 			this.Disconnect();
 			OnLostConnection(EventArgs.Empty);
 		}
