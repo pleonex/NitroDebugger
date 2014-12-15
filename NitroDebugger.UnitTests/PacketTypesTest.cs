@@ -167,6 +167,26 @@ namespace UnitTests
 			Assert.AreEqual("m", cmd.Command);
 			Assert.AreEqual("m2000800,8", cmd.Pack());
 		}
+
+		[Test]
+		public void CreateDataReply()
+		{
+			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE, 0xBE, 0x00, 0x10, 0x20 };
+			DataReply reply = new DataReply(expected);
+			Assert.AreEqual(expected, reply.GetData());
+		}
+
+		[Test]
+		public void FactoryDataReply()
+		{
+			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE, 0xBE, 0x00, 0x10, 0x20 };
+			string dataString = BitConverter.ToString(expected).Replace("-", "");
+
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket(dataString);
+
+			Assert.IsInstanceOf<DataReply>(reply);
+			Assert.AreEqual(expected, ((DataReply)reply).GetData());
+		}
 	}
 }
 
