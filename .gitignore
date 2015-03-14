@@ -5,3 +5,7 @@ NitroDebugger.UnitTests/obj/
 .nuget/NuGet.exe
 *.userprefs
 packages/
+*.dll
+IO_RegisterViewer/bin/Debug/NitroDebugger.exe
+*.txt
+*.cache
