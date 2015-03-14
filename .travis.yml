@@ -16,5 +16,8 @@ before_script:
   - sudo apt-get install nunit-console
 
 script:
+  - libgame/libs/mono-addins/autogen.sh
+  - make -f libgame/libs/mono-addins/Makefile
+  - xbuild libgame/libgame.sln
   - xbuild NitroDebugger.sln
   - nunit-console NitroDebugger.UnitTests/bin/Debug/NitroDebugger.UnitTests.dll
