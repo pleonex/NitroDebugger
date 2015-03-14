@@ -59,6 +59,7 @@
     <Compile Include="RSP\Packets\WriteMemoryCommand.cs" />
     <Compile Include="ErrorCode.cs" />
     <Compile Include="RSP\ConnectionManager.cs" />
+    <Compile Include="RSP\ExecutionManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

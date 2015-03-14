@@ -138,7 +138,7 @@ namespace UnitTests
 			for (int i = 0; i < 10; i++)
 				this.SendPacket("@", "");
 
-			StopSignal reason = this.client.AskHaltedReason();
+			StopSignal reason = this.client.Execution.AskHaltedReason();
 			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
 			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
@@ -148,7 +148,7 @@ namespace UnitTests
 		public void CommandUnexepectedReply()
 		{
 			this.SendPacket("OK", "");
-			StopSignal reason = this.client.AskHaltedReason();
+			StopSignal reason = this.client.Execution.AskHaltedReason();
 			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
 			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
@@ -159,7 +159,7 @@ namespace UnitTests
 		{
 			this.serverClient.Close();
 			this.client.Connection.LostConnection += new LostConnectionEventHandle(LostConnection);
-			this.client.AskHaltedReason();
+			this.client.Execution.AskHaltedReason();
 		}
 
 		private void LostConnection(object sender, EventArgs e)
@@ -173,14 +173,14 @@ namespace UnitTests
 		public void CommandConnectionLostDoesNotRaiseHandle()
 		{
 			this.serverClient.Close();
-			Assert.DoesNotThrow(() => this.client.AskHaltedReason());
+			Assert.DoesNotThrow(() => this.client.Execution.AskHaltedReason());
 		}
 
 		[Test]
 		public void Interrupt()
 		{
 			this.SendPacket("S", "02");
-			bool stopped = this.client.StopExecution();
+			bool stopped = this.client.Execution.Stop();
 			Assert.IsTrue(stopped);
 
 			string rcv = this.Read();
@@ -191,7 +191,7 @@ namespace UnitTests
 		public void InterruptInvalidSignal()
 		{
 			this.SendPacket("S", "03");
-			bool stopped = this.client.StopExecution();
+			bool stopped = this.client.Execution.Stop();
 			Assert.IsFalse(stopped);
 		}
 
@@ -202,7 +202,7 @@ namespace UnitTests
 			for (int i = 0; i < 10; i++)
 				this.SendPacket("@", "");
 
-			bool stopped = this.client.StopExecution();
+			bool stopped = this.client.Execution.Stop();
 			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.IsFalse(stopped);
 			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
@@ -212,7 +212,7 @@ namespace UnitTests
 		public void InterruptUnexepectedReply()
 		{
 			this.SendPacket("OK", "");
-			bool stopped = this.client.StopExecution();
+			bool stopped = this.client.Execution.Stop();
 			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.IsFalse(stopped);
 			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
@@ -223,7 +223,7 @@ namespace UnitTests
 		{
 			this.serverClient.Close();
 			this.client.Connection.LostConnection += new LostConnectionEventHandle(LostConnection);
-			bool stopped = this.client.StopExecution();
+			bool stopped = this.client.Execution.Stop();
 			Assert.IsFalse(stopped);
 		}
 
@@ -239,7 +239,7 @@ namespace UnitTests
 		public void AskHaltedReason()
 		{
 			this.SendPacket("S", "02");
-			StopSignal reason = this.client.AskHaltedReason();
+			StopSignal reason = this.client.Execution.AskHaltedReason();
 			Assert.IsTrue(reason.HasFlag(StopSignal.HostBreak));
 
 			string rcv = this.Read();
@@ -250,7 +250,7 @@ namespace UnitTests
 		public void ContinueExecution()
 		{
 			this.serverStream.WriteByte(RawPacket.Ack);
-			this.client.ContinueExecution();
+			this.client.Execution.Continue();
 
 			string rcv = this.Read();
 			Assert.AreEqual("c", rcv.Substring(1, rcv.Length - 4));
@@ -259,8 +259,8 @@ namespace UnitTests
 		[Test]
 		public void ContinueExecutionAsync()
 		{
-			this.client.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
-			this.client.ContinueExecution();
+			this.client.Execution.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
+			this.client.Execution.Continue();
 
 			string rcv = this.Read();
 			Assert.AreEqual("c", rcv.Substring(1, rcv.Length - 4));
@@ -280,7 +280,7 @@ namespace UnitTests
 		public void StepInto()
 		{
 			this.serverStream.WriteByte(RawPacket.Ack);
-			this.client.StepInto();
+			this.client.Execution.StepInto();
 
 			string rcv = this.Read();
 			Assert.AreEqual("s", rcv.Substring(1, rcv.Length - 4));
@@ -289,8 +289,8 @@ namespace UnitTests
 		[Test]
 		public void StepIntoAsync()
 		{
-			this.client.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
-			this.client.StepInto();
+			this.client.Execution.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
+			this.client.Execution.StepInto();
 
 			string rcv = this.Read();
 			Assert.AreEqual("s", rcv.Substring(1, rcv.Length - 4));
@@ -301,9 +301,9 @@ namespace UnitTests
 		[Test]
 		public void ContinueIsInterrupted()
 		{
-			this.client.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
+			this.client.Execution.BreakExecution += new BreakExecutionEventHandle(BreakpointExecution);
 
-			this.client.ContinueExecution();
+			this.client.Execution.Continue();
 			string rcv = this.Read();
 			Assert.AreEqual("c", rcv.Substring(1, rcv.Length - 4));
 			this.serverStream.WriteByte(RawPacket.Ack);
@@ -313,7 +313,7 @@ namespace UnitTests
 				this.SendPacket("S", "02");
 			});
 
-			this.client.StopExecution();
+			this.client.Execution.Stop();
 
 			Assert.AreEqual(RawPacket.Ack, this.serverStream.ReadByte());
 			Assert.AreEqual(0, this.serverClient.Available);

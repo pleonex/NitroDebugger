@@ -43,9 +43,15 @@ namespace NitroDebugger.RSP
 		{
 			this.Error = ErrorCode.NoError;
 			this.Connection = new ConnectionManager(this);
+			this.Execution = new ExecutionManager(this);
 		}
 
 		public ConnectionManager Connection {
+			get;
+			private set;
+		}
+
+		public ExecutionManager Execution {
 			get;
 			private set;
 		}
@@ -58,36 +64,7 @@ namespace NitroDebugger.RSP
 		internal Presentation Presentation {
 			get;
 			set;
-		}
-
-		public event BreakExecutionEventHandle BreakExecution;
-
-		private void OnBreakExecution(StopSignal signal)
-		{
-			if (BreakExecution != null)
-				BreakExecution(this, signal);
-		}
-
-		public bool StopExecution()
-		{
-			// Stop any pending continue / step asyn task
-			if (this.currentTask != null) {
-				this.Presentation.CancelRead(this.currentTask);
-				this.currentTask = null;
-			}
-
-			ReplyPacket response = this.SafeInterruption();
-			if (response == null)
-				return false;
-
-			return ((StopSignalReply)response).Signal.HasFlag(StopSignal.HostBreak);
-		}
-
-		public StopSignal AskHaltedReason()
-		{
-			HaltedReasonCommand command = new HaltedReasonCommand();
-			return this.SendCommandWithSignal(command);
-		}
+		} 
 
 		public byte[] ReadMemory(uint address, int size)
 		{
@@ -103,6 +80,14 @@ namespace NitroDebugger.RSP
 		{
 			WriteMemoryCommand command = new WriteMemoryCommand(address, size, data);
 			this.SendCommandWithoutErrorReply<OkReply>(command);
+		}
+
+		internal void CancelPendingTask()
+		{
+			if (this.currentTask != null) {
+				this.Presentation.CancelRead(this.currentTask);
+				this.currentTask = null;
+			}
 		}
 
 		internal T SendCommandWithoutErrorReply<T>(CommandPacket command)
@@ -121,23 +106,11 @@ namespace NitroDebugger.RSP
 			return reply as T;
 		}
 
-		public void ContinueExecution()
-		{
-			ContinueCommand cont = new ContinueCommand();
-			this.SendCommandWithSignalAsync(cont);
-		}
-
-		public void StepInto()
-		{
-			SingleStep step = new SingleStep();
-			this.SendCommandWithSignalAsync(step);
-		}
-
 		internal void SendCommandWithSignalAsync(CommandPacket cmd)
 		{
 			this.currentTask = Task.Run(() => {
 				StopSignal signal = SendCommandWithSignal(cmd);
-				OnBreakExecution(signal);
+				this.Execution.OnBreakExecution(signal);
 			});
 		}
 
@@ -150,7 +123,7 @@ namespace NitroDebugger.RSP
 			return ((StopSignalReply)response).Signal;
 		}
 
-		private ReplyPacket SafeInterruption()
+		internal ReplyPacket SafeInterruption()
 		{
 			this.Error = ErrorCode.NoError;
 			ReplyPacket response = null;

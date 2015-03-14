@@ -64,7 +64,7 @@ namespace NitroDebugger
 
 				case "HR?":
 				case "haltedreason":
-					Console.WriteLine(client.AskHaltedReason());
+					Console.WriteLine(client.Execution.AskHaltedReason());
 					break;
 
 				default:
