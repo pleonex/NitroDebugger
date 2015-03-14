@@ -29,8 +29,6 @@ using NitroDebugger.RSP.Packets;
 
 namespace NitroDebugger.RSP
 {
-	public delegate void LostConnectionEventHandle(object sender, EventArgs e);
-
 	public delegate void BreakExecutionEventHandle(object sender, StopSignal signal);
 
 	/// <summary>
@@ -39,27 +37,15 @@ namespace NitroDebugger.RSP
 	/// </summary>
 	public class GdbClient
 	{
-		private Presentation presentation;
 		private Task currentTask;
 
-		public GdbClient(string host, int port)
+		public GdbClient()
 		{
-			this.Host  = host;
-			this.Port  = port;
 			this.Error = ErrorCode.NoError;
+			this.Connection = new ConnectionManager(this);
 		}
 
-		public string Host {
-			get;
-			private set;
-		}
-
-		public int Port {
-			get;
-			private set;
-		}
-
-		public bool IsConnected {
+		public ConnectionManager Connection {
 			get;
 			private set;
 		}
@@ -69,17 +55,12 @@ namespace NitroDebugger.RSP
 			private set;
 		}
 
-		public event LostConnectionEventHandle LostConnection;
+		internal Presentation Presentation {
+			get;
+			set;
+		}
 
 		public event BreakExecutionEventHandle BreakExecution;
-
-		private void OnLostConnection(EventArgs e)
-		{
-			this.IsConnected = false;
-
-			if (LostConnection != null)
-				LostConnection(this, e);
-		}
 
 		private void OnBreakExecution(StopSignal signal)
 		{
@@ -87,33 +68,11 @@ namespace NitroDebugger.RSP
 				BreakExecution(this, signal);
 		}
 
-		public void Connect()
-		{
-			if (this.IsConnected)
-				return;
-
-			try {
-				this.presentation = new Presentation(this.Host, this.Port);
-				this.IsConnected = true;
-			} catch (SocketException) {
-				this.IsConnected = false;
-			}
-		}
-
-		public void Disconnect()
-		{
-			if (!this.IsConnected)
-				return;
-
-			this.presentation.Close();
-			this.IsConnected = false;
-		}
-
 		public bool StopExecution()
 		{
 			// Stop any pending continue / step asyn task
 			if (this.currentTask != null) {
-				this.presentation.CancelRead(this.currentTask);
+				this.Presentation.CancelRead(this.currentTask);
 				this.currentTask = null;
 			}
 
@@ -146,7 +105,7 @@ namespace NitroDebugger.RSP
 			this.SendCommandWithoutErrorReply<OkReply>(command);
 		}
 
-		private T SendCommandWithoutErrorReply<T>(CommandPacket command)
+		internal T SendCommandWithoutErrorReply<T>(CommandPacket command)
 			where T : ReplyPacket
 		{
 			ReplyPacket reply = this.SafeSending(command, typeof(T), typeof(ErrorReply));
@@ -174,7 +133,7 @@ namespace NitroDebugger.RSP
 			this.SendCommandWithSignalAsync(step);
 		}
 
-		private void SendCommandWithSignalAsync(CommandPacket cmd)
+		internal void SendCommandWithSignalAsync(CommandPacket cmd)
 		{
 			this.currentTask = Task.Run(() => {
 				StopSignal signal = SendCommandWithSignal(cmd);
@@ -182,7 +141,7 @@ namespace NitroDebugger.RSP
 			});
 		}
 
-		private StopSignal SendCommandWithSignal(CommandPacket cmd)
+		internal StopSignal SendCommandWithSignal(CommandPacket cmd)
 		{
 			ReplyPacket response = this.SafeSending(cmd, typeof(StopSignalReply));
 			if (response == null)
@@ -197,7 +156,7 @@ namespace NitroDebugger.RSP
 			ReplyPacket response = null;
 
 			try {
-				response = this.presentation.SendInterrupt();
+				response = this.Presentation.SendInterrupt();
 			} catch (SocketException) {
 				this.Error = ErrorCode.NetworkError;
 			} catch (ProtocolViolationException) {
@@ -221,10 +180,10 @@ namespace NitroDebugger.RSP
 			ReplyPacket response = null;
 
 			try {
-				this.presentation.SendCommand(command);
+				this.Presentation.SendCommand(command);
 
 				if (validReplyTypes.Length > 0)
-					response = this.presentation.ReceiveReply();
+					response = this.Presentation.ReceiveReply();
 			} catch (SocketException) {
 				this.Error = ErrorCode.NetworkError;
 			} catch (ProtocolViolationException) {
@@ -249,8 +208,8 @@ namespace NitroDebugger.RSP
 
 		private void NetworkError()
 		{
-			this.Disconnect();
-			OnLostConnection(EventArgs.Empty);
+			this.Connection.Disconnect();
+			this.Connection.OnLostConnection(EventArgs.Empty);
 		}
 	}
 }

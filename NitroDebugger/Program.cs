@@ -45,8 +45,8 @@ namespace NitroDebugger
 			Console.Write("Hostname: "); 	string hostname = Console.ReadLine();
 			Console.Write("Port: ");		int port = Convert.ToInt32(Console.ReadLine());
 			Console.WriteLine();
-			GdbClient client = new GdbClient(hostname, port);
-			client.Connect();
+			GdbClient client = new GdbClient();
+			client.Connection.Connect(hostname, port);
 
 			// Start the interactive console
 			bool finish = false;
@@ -73,7 +73,7 @@ namespace NitroDebugger
 				}
 			} while (!finish);
 
-			client.Disconnect();
+			client.Connection.Disconnect();
 		}
 	}
 }

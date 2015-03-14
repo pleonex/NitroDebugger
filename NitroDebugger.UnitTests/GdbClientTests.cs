@@ -49,8 +49,8 @@ namespace UnitTests
 			this.server = new TcpListener(IPAddress.Loopback, Port);
 			this.server.Start();
 
-			this.client = new GdbClient(Host, Port);
-			this.client.Connect();
+			this.client = new GdbClient();
+			this.client.Connection.Connect(Host, Port);
 
 			this.serverClient = this.server.AcceptTcpClient();
 			this.serverStream = this.serverClient.GetStream();
@@ -59,7 +59,7 @@ namespace UnitTests
 		[TestFixtureTearDown]
 		public void Dispose()
 		{
-			this.client.Disconnect();
+			this.client.Connection.Disconnect();
 			if (this.serverClient.Connected)
 				this.serverClient.Close();
 			this.server.Stop();
@@ -68,14 +68,14 @@ namespace UnitTests
 		[TearDown]
 		public void ResetServer()
 		{
-			this.client.Disconnect();
+			this.client.Connection.Disconnect();
 			if (this.serverClient.Connected)
 				this.serverClient.Close();
 
 			while (this.server.Pending())
 				this.server.AcceptTcpClient().Close();
 
-			this.client.Connect();
+			this.client.Connection.Connect(Host, Port);
 			this.serverClient = this.server.AcceptTcpClient();
 			this.serverStream = this.serverClient.GetStream();
 		}
@@ -83,42 +83,42 @@ namespace UnitTests
 		[Test]
 		public void StoreHostAndPort()
 		{
-			Assert.AreEqual(Host, this.client.Host);
-			Assert.AreEqual(Port, this.client.Port);
+			Assert.AreEqual(Host, this.client.Connection.Host);
+			Assert.AreEqual(Port, this.client.Connection.Port);
 		}
 
 		[Test]
 		public void Connect()
 		{
-			Assert.IsTrue(this.client.IsConnected);
+			Assert.IsTrue(this.client.Connection.IsConnected);
 		}
 
 		[Test]
 		public void NotConnectedOnBadPort()
 		{
-			GdbClient clientError = new GdbClient("localhost", 10102);
-			clientError.Connect();
-			Assert.IsFalse(clientError.IsConnected);
+			GdbClient clientError = new GdbClient();
+			clientError.Connection.Connect("localhost", 10102);
+			Assert.IsFalse(clientError.Connection.IsConnected);
 		}
 
 		[Test]
 		public void Disconnect()
 		{
-			this.client.Disconnect();
-			Assert.IsFalse(this.client.IsConnected);
+			this.client.Connection.Disconnect();
+			Assert.IsFalse(this.client.Connection.IsConnected);
 		}
 
 		[Test]
 		public void CannotConnectIfConnected()
 		{
-			Assert.DoesNotThrow(() => this.client.Connect());
+			Assert.DoesNotThrow(() => this.client.Connection.Connect("localhost", 10102));
 		}
 
 		[Test]
 		public void CannnotDisconnectIfNotConnected()
 		{
-			this.client.Disconnect();
-			Assert.DoesNotThrow(() => this.client.Disconnect());
+			this.client.Connection.Disconnect();
+			Assert.DoesNotThrow(() => this.client.Connection.Disconnect());
 		}
 
 		public void SendPacket(string cmd, string args)
@@ -139,7 +139,7 @@ namespace UnitTests
 				this.SendPacket("@", "");
 
 			StopSignal reason = this.client.AskHaltedReason();
-			Assert.IsFalse(this.client.IsConnected);
+			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
 			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
 		}
@@ -149,7 +149,7 @@ namespace UnitTests
 		{
 			this.SendPacket("OK", "");
 			StopSignal reason = this.client.AskHaltedReason();
-			Assert.IsFalse(this.client.IsConnected);
+			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.AreEqual(StopSignal.Unknown, reason);
 			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
 		}
@@ -158,14 +158,14 @@ namespace UnitTests
 		public void CommandConnectionLostRaiseHandle()
 		{
 			this.serverClient.Close();
-			this.client.LostConnection += new LostConnectionEventHandle(LostConnection);
+			this.client.Connection.LostConnection += new LostConnectionEventHandle(LostConnection);
 			this.client.AskHaltedReason();
 		}
 
 		private void LostConnection(object sender, EventArgs e)
 		{
-			this.client.LostConnection -= new LostConnectionEventHandle(LostConnection);
-			Assert.IsFalse(this.client.IsConnected);
+			this.client.Connection.LostConnection -= new LostConnectionEventHandle(LostConnection);
+			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.AreEqual(ErrorCode.NetworkError, this.client.Error);
 		}
 
@@ -203,7 +203,7 @@ namespace UnitTests
 				this.SendPacket("@", "");
 
 			bool stopped = this.client.StopExecution();
-			Assert.IsFalse(this.client.IsConnected);
+			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.IsFalse(stopped);
 			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
 		}
@@ -213,7 +213,7 @@ namespace UnitTests
 		{
 			this.SendPacket("OK", "");
 			bool stopped = this.client.StopExecution();
-			Assert.IsFalse(this.client.IsConnected);
+			Assert.IsFalse(this.client.Connection.IsConnected);
 			Assert.IsFalse(stopped);
 			Assert.AreEqual(ErrorCode.ProtocolError, this.client.Error);
 		}
@@ -222,7 +222,7 @@ namespace UnitTests
 		public void InterruptConnectionLostRaiseHandle()
 		{
 			this.serverClient.Close();
-			this.client.LostConnection += new LostConnectionEventHandle(LostConnection);
+			this.client.Connection.LostConnection += new LostConnectionEventHandle(LostConnection);
 			bool stopped = this.client.StopExecution();
 			Assert.IsFalse(stopped);
 		}
