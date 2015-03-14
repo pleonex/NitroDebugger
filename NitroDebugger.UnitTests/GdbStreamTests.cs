@@ -32,77 +32,36 @@ using NitroDebugger;
 namespace UnitTests
 {
 	[TestFixture]
-	public class GdbStreamTests
+	public class GdbStreamTests : GdbTestingBase
 	{
-		private const string Host = "localhost";
-		private const int Port = 10105;
-		private GdbClient client;
-
-		private TcpListener server;
-		private TcpClient serverClient;
-		private NetworkStream serverStream;
+		public GdbStreamTests() : base(1)
+		{
+		}
 
 		[TestFixtureSetUp]
-		public void Setup()
+		protected override void Setup()
 		{
-			this.server = new TcpListener(IPAddress.Loopback, Port);
-			this.server.Start();
-
-			this.client = new GdbClient();
-			this.client.Connection.Connect(Host, Port);
-
-			this.serverClient = this.server.AcceptTcpClient();
-			this.serverStream = this.serverClient.GetStream();
+			base.Setup();
 		}
 
 		[TestFixtureTearDown]
-		public void Dispose()
+		protected override void Dispose()
 		{
-			this.client.Connection.Disconnect();
-			if (this.serverClient.Connected)
-				this.serverClient.Close();
-			this.server.Stop();
+			base.Dispose();
 		}
 
 		[TearDown]
-		public void ResetServer()
+		protected override void ResetServer()
 		{
-			this.client.Connection.Disconnect();
-			if (this.serverClient.Connected)
-				this.serverClient.Close();
-
-			while (this.server.Pending())
-				this.server.AcceptTcpClient().Close();
-
-			this.client.Connection.Connect(Host, Port);
-			this.serverClient = this.server.AcceptTcpClient();
-			this.serverStream = this.serverClient.GetStream();
-		}
-
-		public void SendPacket(string cmd, string args)
-		{
-			Mock<CommandPacket> packet = new Mock<CommandPacket>(cmd);
-			packet.Protected().Setup<string>("PackArguments").Returns(args);
-			byte[] packetBin = PacketBinConverter.ToBinary(packet.Object);
-
-			this.serverStream.WriteByte(RawPacket.Ack);
-			this.serverStream.Write(packetBin, 0, packetBin.Length);
-		}
-
-		private string Read()
-		{
-			Thread.Sleep(50);
-			byte[] buffer = new byte[10 * 1024];
-			int read = this.serverStream.Read(buffer, 0, buffer.Length);
-			return Encoding.ASCII.GetString(buffer, 0, read);
+			base.ResetServer();
 		}
 
 		[Test]
 		public void SeekBegin()
 		{
 			uint offset = 0x08342142;
-			Assert.AreEqual(offset, this.client.Stream.Seek(offset, System.IO.SeekOrigin.Begin));
-			Assert.AreEqual(offset, this.client.Stream.Position);
+			Assert.AreEqual(offset, this.Client.Stream.Seek(offset, System.IO.SeekOrigin.Begin));
+			Assert.AreEqual(offset, this.Client.Stream.Position);
 		}
 
 		[Test]
@@ -111,10 +70,10 @@ namespace UnitTests
 			uint start = 0x10;
 			uint offset = 0x02;
 			uint expected = 0x12;
-			this.client.Stream.Seek(start, System.IO.SeekOrigin.Begin);
+			this.Client.Stream.Seek(start, System.IO.SeekOrigin.Begin);
 
-			Assert.AreEqual(expected, this.client.Stream.Seek(offset, System.IO.SeekOrigin.Current));
-			Assert.AreEqual(expected, this.client.Stream.Position);
+			Assert.AreEqual(expected, this.Client.Stream.Seek(offset, System.IO.SeekOrigin.Current));
+			Assert.AreEqual(expected, this.Client.Stream.Position);
 		}
 
 		[Test]
@@ -125,9 +84,9 @@ namespace UnitTests
 			int size = 8;
 
 			this.SendPacket("", BitConverter.ToString(expected).Replace("-", ""));
-			byte[] actual = this.client.Stream.Read(address, size);
+			byte[] actual = this.Client.Stream.Read(address, size);
 			Assert.AreEqual(expected, actual);
-			Assert.AreEqual(ErrorCode.NoError, this.client.Error);
+			Assert.AreEqual(ErrorCode.NoError, this.Client.Error);
 
 			string rcv = this.Read();
 			Assert.AreEqual("m2000800,8", rcv.Substring(1, rcv.Length - 5));
@@ -141,9 +100,9 @@ namespace UnitTests
 			int size = 8;
 
 			this.SendPacket("E", "03");
-			byte[] actual = this.client.Stream.Read(address, size);
+			byte[] actual = this.Client.Stream.Read(address, size);
 			Assert.AreEqual(expected, actual);
-			Assert.AreEqual(ErrorCode.ReadMemoryError, this.client.Error);
+			Assert.AreEqual(ErrorCode.ReadMemoryError, this.Client.Error);
 		}
 
 		[Test]
@@ -154,8 +113,8 @@ namespace UnitTests
 			int size = 8;
 
 			this.SendPacket("OK", "");
-			this.client.Stream.Write(address, size, expected);
-			Assert.AreEqual(ErrorCode.NoError, this.client.Error);
+			this.Client.Stream.Write(address, size, expected);
+			Assert.AreEqual(ErrorCode.NoError, this.Client.Error);
 
 			string rcv = this.Read();
 			string dataString = BitConverter.ToString(expected).Replace("-", "");
