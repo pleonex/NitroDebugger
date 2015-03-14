@@ -1,0 +1,3 @@
+[submodule "libgame"]
+	path = libgame
+	url = git@github.com:pleonex/libgame.git
