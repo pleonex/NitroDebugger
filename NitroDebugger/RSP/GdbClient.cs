@@ -44,6 +44,7 @@ namespace NitroDebugger.RSP
 			this.Error = ErrorCode.NoError;
 			this.Connection = new ConnectionManager(this);
 			this.Execution = new ExecutionManager(this);
+			this.Stream = new GdbStream(this);
 		}
 
 		public ConnectionManager Connection {
@@ -52,6 +53,11 @@ namespace NitroDebugger.RSP
 		}
 
 		public ExecutionManager Execution {
+			get;
+			private set;
+		}
+
+		public GdbStream Stream {
 			get;
 			private set;
 		}
@@ -65,22 +71,6 @@ namespace NitroDebugger.RSP
 			get;
 			set;
 		} 
-
-		public byte[] ReadMemory(uint address, int size)
-		{
-			ReadMemoryCommand command = new ReadMemoryCommand(address, size);
-			DataReply reply = this.SendCommandWithoutErrorReply<DataReply>(command);
-			if (reply == null)
-				return new byte[0];
-
-			return reply.GetData();
-		}
-
-		public void WriteMemory(uint address, int size, byte[] data)
-		{
-			WriteMemoryCommand command = new WriteMemoryCommand(address, size, data);
-			this.SendCommandWithoutErrorReply<OkReply>(command);
-		}
 
 		internal void CancelPendingTask()
 		{

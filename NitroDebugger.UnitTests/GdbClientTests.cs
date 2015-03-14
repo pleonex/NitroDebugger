@@ -318,51 +318,6 @@ namespace UnitTests
 			Assert.AreEqual(RawPacket.Ack, this.serverStream.ReadByte());
 			Assert.AreEqual(0, this.serverClient.Available);
 		}
-
-		[Test]
-		public void ReadMemoryGood()
-		{
-			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE, 0xBE, 0x00, 0x10, 0x20, 0x39 };
-			uint address = 0x02000800;
-			int size = 8;
-
-			this.SendPacket("", BitConverter.ToString(expected).Replace("-", ""));
-			byte[] actual = this.client.ReadMemory(address, size);
-			Assert.AreEqual(expected, actual);
-			Assert.AreEqual(ErrorCode.NoError, this.client.Error);
-
-			string rcv = this.Read();
-			Assert.AreEqual("m2000800,8", rcv.Substring(1, rcv.Length - 5));
-		}
-			
-		[Test]
-		public void ReadMemoryErrorReading()
-		{
-			byte[] expected = new byte[0];
-			uint address = 0x02000800;
-			int size = 8;
-
-			this.SendPacket("E", "03");
-			byte[] actual = this.client.ReadMemory(address, size);
-			Assert.AreEqual(expected, actual);
-			Assert.AreEqual(ErrorCode.ReadMemoryError, this.client.Error);
-		}
-
-		[Test]
-		public void WriteMemoryGood()
-		{
-			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE, 0xBE, 0x00, 0x10, 0x20, 0x39 };
-			uint address = 0x02000800;
-			int size = 8;
-
-			this.SendPacket("OK", "");
-			this.client.WriteMemory(address, size, expected);
-			Assert.AreEqual(ErrorCode.NoError, this.client.Error);
-
-			string rcv = this.Read();
-			string dataString = BitConverter.ToString(expected).Replace("-", "");
-			Assert.AreEqual("M2000800,8:" + dataString, rcv.Substring(1, rcv.Length - 5));
-		}
 	}
 }
 

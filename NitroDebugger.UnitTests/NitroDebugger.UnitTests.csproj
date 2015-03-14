@@ -45,6 +45,7 @@
     <Compile Include="PresentationTests.cs" />
     <Compile Include="Signals.cs" />
     <Compile Include="GdbClientTests.cs" />
+    <Compile Include="GdbStreamTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
