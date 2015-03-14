@@ -25,7 +25,17 @@ namespace NitroDebugger.RSP
 {
 	public static class GdbSessionManager
 	{
+		const int DefaultIndex = 0;
+		static int LastIndex = 0;
 		static Dictionary<int, GdbClient> clientes = new Dictionary<int, GdbClient>();
+
+		public static GdbClient GetDefaultClient()
+		{
+			if (!clientes.ContainsKey(DefaultIndex))
+				throw new KeyNotFoundException("There is not any default client");
+
+			return clientes[DefaultIndex];
+		}
 
 		public static GdbClient GetClient(int index)
 		{
@@ -33,6 +43,12 @@ namespace NitroDebugger.RSP
 				throw new KeyNotFoundException("This client has not been created");
 
 			return clientes[index];
+		}
+
+		public static int AddClient(GdbClient client)
+		{
+			clientes.Add(LastIndex++, client);
+			return LastIndex - 1;
 		}
 
 		public static void AddClient(int index, GdbClient client)

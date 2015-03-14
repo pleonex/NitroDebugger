@@ -88,6 +88,30 @@ namespace UnitTests
 			GdbSessionManager.Clear();
 			Assert.Throws<KeyNotFoundException>(() => GdbSessionManager.GetClient(1));
 		}
+
+		[Test]
+		public void GetDefaultForIndexZero()
+		{
+			var client = new GdbClient();
+			GdbSessionManager.AddClient(0, client);
+			Assert.AreSame(client, GdbSessionManager.GetDefaultClient());
+		}
+
+		[Test]
+		public void ReturnsDefaultOnlyForIndexZero()
+		{
+			var client = new GdbClient();
+			GdbSessionManager.AddClient(1, client);
+			Assert.Throws<KeyNotFoundException>(() => GdbSessionManager.GetDefaultClient());
+		}
+
+		[Test]
+		public void AddDefaultGetsDefault()
+		{
+			var client = new GdbClient();
+			GdbSessionManager.AddClient(client);
+			Assert.AreSame(client, GdbSessionManager.GetDefaultClient());
+		}
 	}
 }
 
