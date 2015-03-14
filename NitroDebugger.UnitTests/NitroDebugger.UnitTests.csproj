@@ -50,6 +50,7 @@
     <Compile Include="GdbClientTests.cs" />
     <Compile Include="GdbStreamTests.cs" />
     <Compile Include="GdbTestingBase.cs" />
+    <Compile Include="GdbSessionManagerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

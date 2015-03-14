@@ -64,6 +64,7 @@
     <Compile Include="RSP\ConnectionManager.cs" />
     <Compile Include="RSP\ExecutionManager.cs" />
     <Compile Include="RSP\GdbStream.cs" />
+    <Compile Include="RSP\GdbSessionManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
