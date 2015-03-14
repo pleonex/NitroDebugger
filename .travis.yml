@@ -14,6 +14,7 @@ before_install:
 # In this way it does not override install
 before_script:
   - sudo apt-get install nunit-console
+  - sudo apt-get install gtk-sharp2
 
 script:
   - cd libgame/libs/mono-addins
