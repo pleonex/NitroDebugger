@@ -21,7 +21,7 @@
 using System;
 using System.Text;
 
-namespace NitroDebugger
+namespace NitroDebugger.RSP
 {
 	public static class Checksum
 	{
