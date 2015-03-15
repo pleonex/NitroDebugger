@@ -51,6 +51,7 @@
     <Compile Include="GdbStreamTests.cs" />
     <Compile Include="GdbTestingBase.cs" />
     <Compile Include="GdbSessionManagerTests.cs" />
+    <Compile Include="PluginTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

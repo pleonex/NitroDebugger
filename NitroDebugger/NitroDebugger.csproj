@@ -36,6 +36,9 @@
     <Reference Include="libgame">
       <HintPath>..\libgame\bin\Debug\libgame.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Addins">
+      <HintPath>..\libgame\libs\mono-addins\bin\Mono.Addins.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -65,6 +68,7 @@
     <Compile Include="RSP\ExecutionManager.cs" />
     <Compile Include="RSP\GdbStream.cs" />
     <Compile Include="RSP\GdbSessionManager.cs" />
+    <Compile Include="Plugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
