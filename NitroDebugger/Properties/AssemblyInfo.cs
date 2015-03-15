@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Mono.Addins;
 
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
@@ -40,3 +41,4 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
 
+[assembly:AddinRoot("NitroDebugger", "1.0")]
