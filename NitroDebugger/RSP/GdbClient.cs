@@ -48,6 +48,7 @@ namespace NitroDebugger.RSP
 			this.Connection = new ConnectionManager(this);
 			this.Execution = new ExecutionManager(this);
 			this.Stream = new GdbStream(this);
+			this.Registers = new RegisterManager(this);
 			this.Root = new GameFile("root", null);
 		}
 
@@ -79,6 +80,11 @@ namespace NitroDebugger.RSP
 		}
 
 		public GdbStream Stream {
+			get;
+			private set;
+		}
+
+		public RegisterManager Registers {
 			get;
 			private set;
 		}

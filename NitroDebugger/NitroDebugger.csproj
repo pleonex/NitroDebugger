@@ -81,6 +81,7 @@
     <Compile Include="Register.cs" />
     <Compile Include="RSP\Packets\WriteRegisters.cs" />
     <Compile Include="RSP\Packets\WriteSingleRegister.cs" />
+    <Compile Include="RSP\RegisterManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
