@@ -5,7 +5,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NitroDebugger", "NitroDebug
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NitroDebugger.UnitTests", "NitroDebugger.UnitTests\NitroDebugger.UnitTests.csproj", "{A114EA52-2DC2-4DD3-937B-CD9FB236BA74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IO_RegisterViewer", "IO_RegisterViewer\IO_RegisterViewer.csproj", "{E93E7091-28C4-4474-9E62-9AF5F0633A63}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{D0E8731F-9563-4B42-9B6C-B9AA0A160C70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IO_RegisterViewer", "Plugins\IO_RegisterViewer\IO_RegisterViewer.csproj", "{E93E7091-28C4-4474-9E62-9AF5F0633A63}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +27,9 @@ Global
 		{FBAFCD9C-6B05-41C5-AEED-19784A9DC8C1}.Debug|x86.Build.0 = Debug|x86
 		{FBAFCD9C-6B05-41C5-AEED-19784A9DC8C1}.Release|x86.ActiveCfg = Release|x86
 		{FBAFCD9C-6B05-41C5-AEED-19784A9DC8C1}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E93E7091-28C4-4474-9E62-9AF5F0633A63} = {D0E8731F-9563-4B42-9B6C-B9AA0A160C70}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

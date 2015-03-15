@@ -36,7 +36,7 @@ namespace IO_RegisterViewer
 		{
 			GdbStream stream = GdbSessionManager.GetDefaultClient().Stream;
 
-			BinaryReader br = new BinaryReader();
+			BinaryReader br = new BinaryReader(stream);
 			stream.Seek(0x4000000, SeekOrigin.Begin);
 
 			this.Dispcnt  = br.ReadInt32();
