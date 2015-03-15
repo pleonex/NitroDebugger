@@ -79,6 +79,7 @@
     <Compile Include="RSP\Packets\ReadRegisters.cs" />
     <Compile Include="RSP\Packets\RegistersReply.cs" />
     <Compile Include="Register.cs" />
+    <Compile Include="RSP\Packets\WriteRegisters.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
