@@ -255,7 +255,7 @@ namespace UnitTests
 			Assert.AreEqual(expected, ((RegistersReply)reply).GetRegisters());
 		}
 
-		private Register[] CreateRegisters()
+		public static Register[] CreateRegisters()
 		{
 			return new Register[] {
 				new Register(RegisterType.R0, 0),   new Register(RegisterType.R1, 1),
@@ -266,11 +266,11 @@ namespace UnitTests
 				new Register(RegisterType.R10, 10), new Register(RegisterType.R11, 11),
 				new Register(RegisterType.R12, 12), new Register(RegisterType.LR, 13),
 				new Register(RegisterType.SP, 14),  new Register(RegisterType.PC, 15),
-				new Register(RegisterType.CPSR, 255)
+				new Register(RegisterType.CPSR, 25)
 			};
 		}
 
-		private byte[] CreateNetworkRegisters()
+		public static byte[] CreateNetworkRegisters()
 		{
 			return new byte[] { 
 				0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
@@ -296,7 +296,7 @@ namespace UnitTests
 				0x00, 0x00, 0x00, 0x00,
 
 				// CPSR
-				0xFF, 0x0, 0x0, 0x00
+				0x19, 0x0, 0x0, 0x00
 			};
 		}
 
