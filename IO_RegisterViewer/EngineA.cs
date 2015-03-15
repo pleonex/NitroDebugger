@@ -12,8 +12,10 @@ namespace IO_RegisterViewer
 			throw new NotImplementedException ();
 		}
 
-		public override void Read (GdbStream stream)
+		public override void Read ()
 		{
+			GdbStream stream = new GdbStream (GdbSessionManager.GetClient(0));
+
 			if (stream == null)
 				return;
 
@@ -56,8 +58,10 @@ namespace IO_RegisterViewer
 				throw new NotImplementedException ();
 			}
 
-			public override void Read (GdbStream stream)
+			public override void Read ()
 			{
+				GdbStream stream = new GdbStream (GdbSessionManager.GetClient(0));
+
 				BinaryReader br = new BinaryReader (stream);
 
 				this.Bg0cnt   = br.ReadInt16 ();

@@ -25,8 +25,8 @@ namespace NitroDebugger
 {
 	public abstract class DataStructure
 	{
-		public abstract void Read(GdbStream stream);
-		public abstract void Write(GdbStream stream);
+		public abstract void Read();
+		public abstract void Write();
 	}
 
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
