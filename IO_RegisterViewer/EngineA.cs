@@ -14,7 +14,7 @@ namespace IO_RegisterViewer
 
 		public override void Read ()
 		{
-			GdbStream stream = new GdbStream (GdbSessionManager.GetClient(0));
+			GdbStream stream = GdbSessionManager.GetDefaultClient().Stream;
 
 			if (stream == null)
 				return;
@@ -40,7 +40,6 @@ namespace IO_RegisterViewer
 		public short    Dispstat       { get; set; }
 		public short    Vcount         { get; set; }
 		public Engine2D Engine2dA      { get; set; }
-		// 
 		public short    Disp3dcnt      { get; set; }
 		public int      Dispcapcnt     { get; set; }
 		public int      Disp_mmem_fifo { get; set; }
@@ -60,7 +59,7 @@ namespace IO_RegisterViewer
 
 			public override void Read ()
 			{
-				GdbStream stream = new GdbStream (GdbSessionManager.GetClient(0));
+				GdbStream stream = GdbSessionManager.GetDefaultClient().Stream;
 
 				BinaryReader br = new BinaryReader (stream);
 
