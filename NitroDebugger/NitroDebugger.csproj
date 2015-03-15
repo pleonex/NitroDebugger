@@ -76,6 +76,7 @@
     <Compile Include="StructPanel.cs" />
     <Compile Include="DataStructure.cs" />
     <Compile Include="VisualPlugin.cs" />
+    <Compile Include="RSP\Packets\ReadRegisters.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
