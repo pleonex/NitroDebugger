@@ -22,7 +22,7 @@ using System;
 using Gtk;
 using Mono.Addins;
 
-namespace NitroDebugger
+namespace NitroDebugger.Plugins
 {
 	[TypeExtensionPoint]
 	public abstract class VisualPlugin : Plugin

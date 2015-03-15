@@ -24,7 +24,7 @@ using System.Reflection;
 using Gtk;
 using Mono.Addins;
 
-namespace NitroDebugger
+namespace NitroDebugger.Plugins
 {
 	[TypeExtensionPoint]
 	public abstract class StructPanel<T> : VisualPlugin

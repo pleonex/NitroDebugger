@@ -20,7 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 
-namespace NitroDebugger
+namespace NitroDebugger.Plugins
 {
 	public abstract class DataStructure
 	{

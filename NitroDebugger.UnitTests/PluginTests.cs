@@ -21,7 +21,7 @@
 using System;
 using System.Linq;
 using Moq;
-using NitroDebugger;
+using NitroDebugger.Plugins;
 using NUnit.Framework;
 
 namespace UnitTests

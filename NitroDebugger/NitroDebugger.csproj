@@ -72,10 +72,10 @@
     <Compile Include="RSP\ExecutionManager.cs" />
     <Compile Include="RSP\GdbStream.cs" />
     <Compile Include="RSP\GdbSessionManager.cs" />
-    <Compile Include="Plugin.cs" />
-    <Compile Include="StructPanel.cs" />
-    <Compile Include="DataStructure.cs" />
-    <Compile Include="VisualPlugin.cs" />
+    <Compile Include="Plugins\Plugin.cs" />
+    <Compile Include="Plugins\StructPanel.cs" />
+    <Compile Include="Plugins\DataStructure.cs" />
+    <Compile Include="Plugins\VisualPlugin.cs" />
     <Compile Include="RSP\Packets\ReadRegisters.cs" />
     <Compile Include="RSP\Packets\RegistersReply.cs" />
     <Compile Include="Register.cs" />
@@ -87,5 +87,6 @@
   <ItemGroup>
     <Folder Include="RSP\" />
     <Folder Include="RSP\Packets\" />
+    <Folder Include="Plugins\" />
   </ItemGroup>
 </Project>

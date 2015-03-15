@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Mono.Addins;
 
-namespace NitroDebugger
+namespace NitroDebugger.Plugins
 {
 	[TypeExtensionPoint]
 	public abstract class Plugin : IDisposable
