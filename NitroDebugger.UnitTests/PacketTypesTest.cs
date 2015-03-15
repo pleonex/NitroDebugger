@@ -244,7 +244,20 @@ namespace UnitTests
 		[Test]
 		public void FactoryRegistersReply()
 		{
-			Register[] expected = new Register[] {
+			Register[] expected = CreateRegisters();
+			byte[] binRegisters = CreateNetworkRegisters();
+			string regString = BitConverter.ToString(binRegisters).Replace("-", "");
+
+			ReadRegisters readRegisters = new ReadRegisters();
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket(regString, readRegisters);
+
+			Assert.IsInstanceOf<RegistersReply>(reply);
+			Assert.AreEqual(expected, ((RegistersReply)reply).GetRegisters());
+		}
+
+		private Register[] CreateRegisters()
+		{
+			return new Register[] {
 				new Register(RegisterType.R0, 0),   new Register(RegisterType.R1, 1),
 				new Register(RegisterType.R2, 2),   new Register(RegisterType.R3, 3),
 				new Register(RegisterType.R4, 4),   new Register(RegisterType.R5, 5),
@@ -255,7 +268,11 @@ namespace UnitTests
 				new Register(RegisterType.SP, 14),  new Register(RegisterType.PC, 15),
 				new Register(RegisterType.CPSR, 255)
 			};
-			byte[] binRegisters = new byte[] { 
+		}
+
+		private byte[] CreateNetworkRegisters()
+		{
+			return new byte[] { 
 				0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
 				0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
 				0x04, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00,
@@ -281,13 +298,19 @@ namespace UnitTests
 				// CPSR
 				0xFF, 0x0, 0x0, 0x00
 			};
-			string regString = BitConverter.ToString(binRegisters).Replace("-", "");
+		}
 
-			ReadRegisters readRegisters = new ReadRegisters();
-			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket(regString, readRegisters);
+		[Test]
+		public void CreateWriteRegistersCommand()
+		{
+			Register[] registers = CreateRegisters();
+			string networkRegisters = BitConverter.ToString(CreateNetworkRegisters());
+			networkRegisters = networkRegisters.Replace("-", "");
 
-			Assert.IsInstanceOf<RegistersReply>(reply);
-			Assert.AreEqual(expected, ((RegistersReply)reply).GetRegisters());
+			WriteRegisters cmd = null;
+			Assert.DoesNotThrow(() => cmd = new WriteRegisters(registers));
+			Assert.AreEqual("G", cmd.Command);
+			Assert.AreEqual("G" + networkRegisters, cmd.Pack());
 		}
 	}
 }
