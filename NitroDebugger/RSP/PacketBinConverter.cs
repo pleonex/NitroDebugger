@@ -46,7 +46,7 @@ namespace NitroDebugger.RSP
 			return TextEncoding.GetBytes(binPacket.ToString());
 		}
 
-		public static ReplyPacket FromBinary(byte[] data)
+		public static ReplyPacket FromBinary(byte[] data, CommandPacket commandSent = null)
 		{
 			if (!ValidateBinary(data))
 				throw new FormatException("[BIN] Invalid packet");
@@ -61,7 +61,7 @@ namespace NitroDebugger.RSP
 			if (receivedChecksum != calculatedChecksum.ToString("x2"))
 				throw new FormatException("[BIN] Invalid checksum");
 
-			return ReplyPacketFactory.CreateReplyPacket(packetData);
+			return ReplyPacketFactory.CreateReplyPacket(packetData, commandSent);
 		}
 
 		private static bool ValidateBinary(byte[] data)

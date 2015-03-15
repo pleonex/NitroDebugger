@@ -26,7 +26,7 @@ namespace NitroDebugger.RSP
 {
 	public static class ReplyPacketFactory
 	{
-		public static ReplyPacket CreateReplyPacket(string data)
+		public static ReplyPacket CreateReplyPacket(string data, CommandPacket commandSent = null)
 		{
 			if (data == "OK")
 				return new OkReply();
@@ -37,7 +37,7 @@ namespace NitroDebugger.RSP
 			if (data.Length == 3 && data[0] == 'E')
 				return new ErrorReply(Convert.ToInt32(data.Substring(1), 16));
 
-			if (data.Length % 2 == 0) {
+			if (commandSent is ReadMemoryCommand) {
 				try {
 					byte[] dataBytes = Enumerable.Range(0, data.Length / 2)
 						.Select(i => data.Substring(i * 2, 2))
