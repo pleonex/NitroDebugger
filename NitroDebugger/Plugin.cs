@@ -30,7 +30,7 @@ namespace NitroDebugger
 	{
 		static List<Plugin> instances = new List<Plugin>();
 
-		public Plugin()
+		protected Plugin()
 		{
 			instances.Add(this);
 		}
