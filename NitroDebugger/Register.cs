@@ -77,7 +77,7 @@ namespace NitroDebugger
 		LR = 13,
 		SP = 14,
 		PC = 15,
-		CPSR = 16
+		CPSR = 25
 	}
 }
 
