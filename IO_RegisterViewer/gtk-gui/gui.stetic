@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<stetic-interface>
+  <configuration>
+    <images-root-path>..</images-root-path>
+    <target-gtk-version>2.12</target-gtk-version>
+  </configuration>
+  <import>
+    <widget-library name="../../NitroDebugger/bin/Debug/NitroDebugger.exe" />
+    <widget-library name="../bin/Debug/IO_RegisterViewer.dll" internal="true" />
+  </import>
+  <widget class="Gtk.Window" id="IO_RegisterViewer.Window" design-size="400 300">
+    <property name="MemberName" />
+    <property name="Title" translatable="yes">Window</property>
+    <property name="WindowPosition">CenterOnParent</property>
+    <child>
+      <placeholder />
+    </child>
+  </widget>
+</stetic-interface>

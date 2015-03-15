@@ -19,13 +19,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using NitroDebugger.RSP;
 
 namespace NitroDebugger
 {
 	public abstract class DataStructure
 	{
-		public abstract void Read();
-		public abstract void Write();
+		public abstract void Read(GdbStream stream);
+		public abstract void Write(GdbStream stream);
 	}
 
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]

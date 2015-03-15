@@ -1,16 +1,23 @@
 ﻿using System;
 using System.IO;
+using NitroDebugger;
 using NitroDebugger.RSP;
 
 namespace IO_RegisterViewer
 {
-	public class EngineA : IO_Register
+	public class EngineA : DataStructure
 	{
+		public override void Write ()
+		{
+			throw new NotImplementedException ();
+		}
 
-		public void Read (GdbStream stream)
+		public override void Read (GdbStream stream)
 		{
 			if (stream == null)
 				return;
+
+			stream.Seek (0x4000000, SeekOrigin.Begin);
 
 			BinaryReader br = new BinaryReader (stream);
 
@@ -31,6 +38,7 @@ namespace IO_RegisterViewer
 		public short    Dispstat       { get; set; }
 		public short    Vcount         { get; set; }
 		public Engine2D Engine2dA      { get; set; }
+		// 
 		public short    Disp3dcnt      { get; set; }
 		public int      Dispcapcnt     { get; set; }
 		public int      Disp_mmem_fifo { get; set; }
@@ -41,10 +49,14 @@ namespace IO_RegisterViewer
 
 		#endregion
 
-		public class Engine2D : IO_Register
+		public class Engine2D : DataStructure
 		{
+			public override void Write ()
+			{
+				throw new NotImplementedException ();
+			}
 
-			public void Read (GdbStream stream)
+			public override void Read (GdbStream stream)
 			{
 				BinaryReader br = new BinaryReader (stream);
 
@@ -79,9 +91,11 @@ namespace IO_RegisterViewer
 				this.Winin    = br.ReadInt16 ();
 				this.Winout   = br.ReadInt16 ();
 				this.Mosaic   = br.ReadInt16 ();
+				this.NotUsed1 = br.ReadInt16 ();
 				this.Bldcnt   = br.ReadInt16 ();
 				this.Bldalpha = br.ReadInt16 ();
 				this.Bldy     = br.ReadInt16 ();
+				this.NotUsed2 = br.ReadInt16 ();
 			}
 
 
@@ -118,9 +132,11 @@ namespace IO_RegisterViewer
 			public short Winin    { get; set; }
 			public short Winout   { get; set; }
 			public short Mosaic   { get; set; }
+			public short NotUsed1 { get; set; }
 			public short Bldcnt   { get; set; }
 			public short Bldalpha { get; set; }
 			public short Bldy     { get; set; }
+			public short NotUsed2 { get; set; }
 
 			#endregion
 		}
