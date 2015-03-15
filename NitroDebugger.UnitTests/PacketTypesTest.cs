@@ -182,7 +182,8 @@ namespace UnitTests
 			byte[] expected = new byte[] { 0xCA, 0xFE, 0xBE, 0xBE, 0x00, 0x10, 0x20 };
 			string dataString = BitConverter.ToString(expected).Replace("-", "");
 
-			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket(dataString);
+			ReadMemoryCommand readMemory = new ReadMemoryCommand(0x00, 0x00);
+			ReplyPacket reply = ReplyPacketFactory.CreateReplyPacket(dataString, readMemory);
 
 			Assert.IsInstanceOf<DataReply>(reply);
 			Assert.AreEqual(expected, ((DataReply)reply).GetData());

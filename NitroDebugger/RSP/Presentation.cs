@@ -36,6 +36,7 @@ namespace NitroDebugger.RSP
 
 		private Session session;
 		private CancellationTokenSource cts;
+		private CommandPacket lastCommandSent;
 
 		public Presentation(string hostname, int port)
 		{
@@ -50,6 +51,7 @@ namespace NitroDebugger.RSP
 
 		public void SendCommand(CommandPacket command)
 		{
+			this.lastCommandSent = command;
 			this.SendData(PacketBinConverter.ToBinary(command));
 		}
 
@@ -101,7 +103,7 @@ namespace NitroDebugger.RSP
 			try {
 				// Get data
 				byte[] packet = this.session.ReadPacket(PacketSeparator);
-				response = PacketBinConverter.FromBinary(packet);
+				response = PacketBinConverter.FromBinary(packet, lastCommandSent);
 
 				// Send ACK
 				this.session.Write(RawPacket.Ack);
