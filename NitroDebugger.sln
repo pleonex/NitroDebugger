@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NitroDebugger", "NitroDebug
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NitroDebugger.UnitTests", "NitroDebugger.UnitTests\NitroDebugger.UnitTests.csproj", "{A114EA52-2DC2-4DD3-937B-CD9FB236BA74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IO_RegisterViewer", "IO_RegisterViewer\IO_RegisterViewer.csproj", "{E93E7091-28C4-4474-9E62-9AF5F0633A63}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,13 +17,16 @@ Global
 		{A114EA52-2DC2-4DD3-937B-CD9FB236BA74}.Debug|x86.Build.0 = Debug|Any CPU
 		{A114EA52-2DC2-4DD3-937B-CD9FB236BA74}.Release|x86.ActiveCfg = Release|Any CPU
 		{A114EA52-2DC2-4DD3-937B-CD9FB236BA74}.Release|x86.Build.0 = Release|Any CPU
+		{E93E7091-28C4-4474-9E62-9AF5F0633A63}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E93E7091-28C4-4474-9E62-9AF5F0633A63}.Debug|x86.Build.0 = Debug|Any CPU
+		{E93E7091-28C4-4474-9E62-9AF5F0633A63}.Release|x86.ActiveCfg = Release|Any CPU
+		{E93E7091-28C4-4474-9E62-9AF5F0633A63}.Release|x86.Build.0 = Release|Any CPU
 		{FBAFCD9C-6B05-41C5-AEED-19784A9DC8C1}.Debug|x86.ActiveCfg = Debug|x86
 		{FBAFCD9C-6B05-41C5-AEED-19784A9DC8C1}.Debug|x86.Build.0 = Debug|x86
 		{FBAFCD9C-6B05-41C5-AEED-19784A9DC8C1}.Release|x86.ActiveCfg = Release|x86
 		{FBAFCD9C-6B05-41C5-AEED-19784A9DC8C1}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = NitroDebugger\NitroDebugger.csproj
 		Policies = $0
 		$0.ChangeLogPolicy = $1
 		$1.UpdateMode = None

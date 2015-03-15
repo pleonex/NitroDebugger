@@ -19,6 +19,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+<<<<<<< HEAD
+=======
+using NitroDebugger.RSP;
+>>>>>>> b5ae7a8363aa0a20313b9282169aa29958270da8
 
 namespace NitroDebugger
 {
