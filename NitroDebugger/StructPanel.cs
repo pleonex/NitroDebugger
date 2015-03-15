@@ -60,6 +60,8 @@ namespace NitroDebugger
 				dynamic value = prop.GetValue(Data);
 				if (value is bool)
 					CreateComponentForBool(prop, value);
+				else if (value is Enum)
+					CreateComponentForEnum(prop, value);
 			}
 		}
 
@@ -70,6 +72,20 @@ namespace NitroDebugger
 			checkbox.Active = data;
 
 			container.Add(checkbox);
+		}
+
+		private void CreateComponentForEnum(PropertyInfo prop, Enum data)
+		{
+			string descr = prop.GetCustomAttribute<DataDescription>().Description;
+			string[] items = Enum.GetNames(data.GetType());
+
+			var subcontainer = new HBox();
+			subcontainer.Add(new Label(descr));
+
+			var combo = new ComboBox(items);
+			subcontainer.Add(combo);
+
+			container.Add(container);
 		}
 	}
 }
