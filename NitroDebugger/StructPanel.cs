@@ -38,6 +38,7 @@ namespace NitroDebugger
 			Data = new T();
 
 			Data.Read();
+			CreateComponents();
 		}
 
 		public override Container MainContainer {
@@ -47,6 +48,28 @@ namespace NitroDebugger
 		public T Data {
 			get;
 			private set;
+		}
+
+		private void CreateComponents()
+		{
+			BindingFlags flags = BindingFlags.GetProperty | BindingFlags.SetProperty;
+			var properties = typeof(T).GetProperties(flags)
+				.Where(p => p.GetCustomAttribute<DataDescription>() != null);
+
+			foreach (var prop in properties) {
+				dynamic value = prop.GetValue(Data);
+				if (value is bool)
+					CreateComponentForBool(prop, value);
+			}
+		}
+
+		private void CreateComponentForBool(PropertyInfo prop, bool data)
+		{
+			string descr = prop.GetCustomAttribute<DataDescription>().Description;
+			var checkbox = new CheckButton(descr);
+			checkbox.Active = data;
+
+			container.Add(checkbox);
 		}
 	}
 }
