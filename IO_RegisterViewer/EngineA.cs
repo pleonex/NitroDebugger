@@ -36,6 +36,11 @@ namespace IO_RegisterViewer
 		public int      Disp_mmem_fifo { get; set; }
 		public short    Master_bright  { get; set; }
 
+		#region bitter
+
+
+		#endregion
+
 		public class Engine2D : IO_Register
 		{
 
@@ -118,8 +123,6 @@ namespace IO_RegisterViewer
 			public short Bldy     { get; set; }
 
 			#endregion
-
-
 		}
 
 	}
