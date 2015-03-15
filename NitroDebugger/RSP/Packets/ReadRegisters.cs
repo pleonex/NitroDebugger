@@ -25,7 +25,7 @@ namespace NitroDebugger.RSP.Packets
 	public class ReadRegisters : CommandPacket
 	{
 		public ReadRegisters()
-			: base('g')
+			: base("g")
 		{
 		}
 
