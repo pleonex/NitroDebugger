@@ -76,6 +76,19 @@ namespace UnitTests
 		}
 
 		[Test]
+		public void GetRegisterFromIndexer()
+		{
+			Register expected = new Register(RegisterType.R0, 0);
+
+			byte[] networkData = PacketTypesTest.CreateNetworkRegisters();
+			this.SendPacket("", BitConverter.ToString(networkData).Replace("-", ""));
+
+			Register actual = manager[RegisterType.R0];
+			Assert.AreEqual(expected, actual);
+			Assert.AreEqual(ErrorCode.NoError, this.Client.Error);
+		}
+
+		[Test]
 		public void GetCpsrRegister()
 		{
 			TestGetRegister(RegisterType.CPSR);
@@ -116,6 +129,20 @@ namespace UnitTests
 
 			this.SendPacket("OK", "");
 			manager.SetRegister(register);
+			Assert.AreEqual(ErrorCode.NoError, this.Client.Error);
+
+			string rcv = this.Read();
+			Assert.AreEqual(expected, rcv.Substring(1, rcv.Length - 5));
+		}
+
+		[Test]
+		public void WriteSingleQueryWithIndexer()
+		{
+			Register register = new Register(RegisterType.R1, 0x2);
+			string expected = "P01000000=02000000";
+
+			this.SendPacket("OK", "");
+			manager[RegisterType.R1] = register;
 			Assert.AreEqual(ErrorCode.NoError, this.Client.Error);
 
 			string rcv = this.Read();

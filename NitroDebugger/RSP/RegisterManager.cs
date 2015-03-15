@@ -73,6 +73,11 @@ namespace NitroDebugger.RSP
 			WriteSingleRegister(register);
 		}
 
+		public Register this[RegisterType type] {
+			get { return GetRegister(type); }
+			set { SetRegister(value); }
+		}
+
 		private void ReadRegisters()
 		{
 			ReadRegisters command = new ReadRegisters();
