@@ -312,6 +312,16 @@ namespace UnitTests
 			Assert.AreEqual("G", cmd.Command);
 			Assert.AreEqual("G" + networkRegisters, cmd.Pack());
 		}
+
+		[Test]
+		public void CreateWriteSingleRegisterCommand()
+		{
+			Register register = new Register(RegisterType.R12, 0x5040);
+
+			WriteSingleRegister cmd = new WriteSingleRegister(register);
+			Assert.AreEqual("P", cmd.Command);
+			Assert.AreEqual("P0C000000=40500000", cmd.Pack());
+		}
 	}
 }
 
