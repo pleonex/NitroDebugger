@@ -1,11 +1,6 @@
-NitroDebugger/bin/
-NitroDebugger/obj/
-NitroDebugger.UnitTests/bin/
-NitroDebugger.UnitTests/obj/
+**/bin/
+**/obj/
 .nuget/NuGet.exe
 *.userprefs
 packages/
-*.dll
-IO_RegisterViewer/bin/Debug/NitroDebugger.exe
-*.txt
 *.cache
