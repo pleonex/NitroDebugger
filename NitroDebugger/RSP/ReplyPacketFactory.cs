@@ -19,6 +19,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NitroDebugger.RSP.Packets;
 
@@ -39,14 +40,39 @@ namespace NitroDebugger.RSP
 
 			if (commandSent is ReadMemoryCommand) {
 				try {
-					byte[] dataBytes = Enumerable.Range(0, data.Length / 2)
-						.Select(i => data.Substring(i * 2, 2))
-						.Select(b => Convert.ToByte(b, 16)).ToArray();
+					byte[] dataBytes = ConvertToByte(data).ToArray();
 					return new DataReply(dataBytes);
 				} catch (FormatException) { }
 			}
 
+			if (commandSent is ReadRegisters) {
+				try {
+					List<Register> registers = new List<Register>();
+					var byteList = ConvertToByte(data).ToArray();
+
+					// General registers
+					registers.AddRange(Enumerable.Range(0, 16)
+						.Select(i => new Register(
+							(RegisterType)i, BitConverter.ToUInt32(byteList, i * 4)))
+					);
+
+					// CPSR
+					registers.Add(new Register(
+						RegisterType.CPSR, BitConverter.ToUInt32(byteList, 164))
+					);
+
+					return new RegistersReply(registers.ToArray());
+				} catch (FormatException) { }
+			}
+
 			throw new FormatException("Unknown reply");
+		}
+
+		private static IEnumerable<byte> ConvertToByte(string data)
+		{
+			return Enumerable.Range(0, data.Length / 2)
+				.Select(i => data.Substring(i * 2, 2))
+				.Select(b => Convert.ToByte(b, 16));
 		}
 	}
 }
