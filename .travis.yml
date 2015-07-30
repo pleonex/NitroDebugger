@@ -11,14 +11,13 @@ before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
 
-# In this way it does not override install
-before_script:
-  - sudo apt-get install nunit-console
+install:
   - sudo apt-get install gtk-sharp2
+  - nuget restore libgame/libgame.sln
+  - nuget restore NitroDebugger.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 
 script:
-  - cd libgame
-  - xbuild libgame.sln
-  - cd ..
+  - xbuild libgame/libgame.sln
   - xbuild NitroDebugger.sln
-  - nunit-console NitroDebugger.UnitTests/bin/Debug/NitroDebugger.UnitTests.dll
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe NitroDebugger.UnitTests/bin/Debug/NitroDebugger.UnitTests.dll
