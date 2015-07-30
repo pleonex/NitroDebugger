@@ -17,10 +17,7 @@ before_script:
   - sudo apt-get install gtk-sharp2
 
 script:
-  - cd libgame/libs/mono-addins
-  - ./autogen.sh
-  - make
-  - cd ../..
+  - cd libgame
   - xbuild libgame.sln
   - cd ..
   - xbuild NitroDebugger.sln
