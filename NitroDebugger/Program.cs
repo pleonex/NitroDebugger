@@ -67,6 +67,20 @@ namespace NitroDebugger
 					Console.WriteLine(client.Execution.AskHaltedReason());
 					break;
 
+				case "c":
+					client.Execution.Continue();
+					break;
+
+				case "b":
+					client.Execution.Stop();
+					break;
+
+				case "f":
+					System.IO.FileStream fs = new System.IO.FileStream("dump.bin", System.IO.FileMode.Create);
+					client.Stream.CopyTo(fs);
+					fs.Close();
+					break;
+
 				default:
 					Console.WriteLine("Unknown command");
 					break;

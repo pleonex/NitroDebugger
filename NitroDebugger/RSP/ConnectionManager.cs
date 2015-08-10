@@ -73,8 +73,9 @@ namespace NitroDebugger.RSP
 				this.Port = port;
 				this.Client.Presentation = new Presentation(this.Host, this.Port);
 				this.IsConnected = true;
-			} catch (SocketException) {
+			} catch (SocketException ex) {
 				this.IsConnected = false;
+				Console.WriteLine("{ERROR} " + ex.Message);
 			}
 		}
 
