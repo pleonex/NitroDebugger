@@ -2,6 +2,9 @@
 language: csharp
 solution: NitroDebugger.sln
 
+# Use the new Travis CI infrastructure
+sudo: false
+
 # Handle git submodules yourself
 git:
     submodules: false
@@ -12,7 +15,6 @@ before_install:
   - git submodule update --init --recursive
 
 install:
-  - sudo apt-get install gtk-sharp2
   - nuget restore libgame/libgame.sln
   - nuget restore NitroDebugger.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
