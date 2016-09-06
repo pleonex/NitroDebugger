@@ -22,13 +22,9 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
-using NitroDebugger;
 using NitroDebugger.RSP.Packets;
-using Libgame;
 using System.IO;
-using Libgame.IO;
 
 namespace NitroDebugger.RSP
 {
@@ -49,24 +45,6 @@ namespace NitroDebugger.RSP
 			this.Execution = new ExecutionManager(this);
 			this.Stream = new GdbStream(this);
 			this.Registers = new RegisterManager(this);
-			this.Root = new GameFile("root", null);
-		}
-
-		public GdbClient(string game)
-			: this()
-		{
-			if (FileManager.IsInitialized()) {
-				var romStream = new DataStream(game, FileMode.Open, FileAccess.Read);
-				var romFile = new GameFile(Path.GetFileName(game), romStream);
-
-				this.Root = romFile;
-				FileManager.GetInstance().Root.AddFile(romFile);
-			}
-		}
-
-		public GameFile Root {
-			get;
-			private set;
 		}
 
 		public ConnectionManager Connection {
