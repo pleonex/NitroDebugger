@@ -43,27 +43,26 @@ namespace UnitTests
 			Port = PortBase + index;
 		}
 
-		protected virtual void Setup()
+		protected virtual void SetUp()
 		{
 			this.Server = new TcpListener(IPAddress.Loopback, Port);
 			this.Server.Start();
-
 			this.Client = new GdbClient();
-			this.Client.Connection.Connect(Host, Port);
-
-			this.ServerClient = this.Server.AcceptTcpClient();
-			this.ServerStream = this.ServerClient.GetStream();
 		}
 
 		protected virtual void Dispose()
 		{
-			this.Client.Connection.Disconnect();
-			if (this.ServerClient.Connected)
-				this.ServerClient.Close();
 			this.Server.Stop();
 		}
 
-		protected virtual void ResetServer()
+        protected virtual void OpenServer()
+        {
+            this.Client.Connection.Connect(Host, Port);
+            this.ServerClient = this.Server.AcceptTcpClient();
+            this.ServerStream = this.ServerClient.GetStream();
+        }
+
+		protected virtual void CloseServer()
 		{
 			this.Client.Connection.Disconnect();
 			if (this.ServerClient.Connected)
@@ -71,10 +70,6 @@ namespace UnitTests
 
 			while (this.Server.Pending())
 				this.Server.AcceptTcpClient().Close();
-
-			this.Client.Connection.Connect(Host, Port);
-			this.ServerClient = this.Server.AcceptTcpClient();
-			this.ServerStream = this.ServerClient.GetStream();
 		}
 
 		protected void SendPacket(string cmd, string args)

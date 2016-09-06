@@ -41,9 +41,9 @@ namespace UnitTests
 		}
 
 		[TestFixtureSetUp]
-		protected override void Setup()
+		protected override void SetUp()
 		{
-			base.Setup();
+			base.SetUp();
 			manager = Client.Registers;
 		}
 
@@ -53,10 +53,16 @@ namespace UnitTests
 			base.Dispose();
 		}
 
+        [SetUp]
+        protected override void OpenServer()
+        {
+            base.OpenServer();
+        }
+
 		[TearDown]
-		protected override void ResetServer()
+		protected override void CloseServer()
 		{
-			base.ResetServer();
+			base.CloseServer();
 		}
 
 		[Test]

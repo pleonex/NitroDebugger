@@ -25,13 +25,6 @@
 // SOFTWARE.
 using System;
 using NUnit.Framework;
-using NitroDebugger.RSP;
-using System.Net;
-using System.Net.Sockets;
-using Moq;
-using Moq.Protected;
-using System.Threading;
-using System.Text;
 using NitroDebugger;
 
 namespace UnitTests
@@ -44,9 +37,9 @@ namespace UnitTests
 		}
 
 		[TestFixtureSetUp]
-		protected override void Setup()
+		protected override void SetUp()
 		{
-			base.Setup();
+			base.SetUp();
 		}
 
 		[TestFixtureTearDown]
@@ -55,10 +48,16 @@ namespace UnitTests
 			base.Dispose();
 		}
 
+        [SetUp]
+        protected override void OpenServer()
+        {
+            base.OpenServer();
+        }
+
 		[TearDown]
-		protected override void ResetServer()
+		protected override void CloseServer()
 		{
-			base.ResetServer();
+            base.CloseServer();
 		}
 
 		[Test]

@@ -24,13 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Moq;
-using Moq.Protected;
 using NUnit.Framework;
 using NitroDebugger;
 using NitroDebugger.RSP;
@@ -45,9 +39,9 @@ namespace UnitTests
 		}
 
 		[TestFixtureSetUp]
-		protected override void Setup()
+		protected override void SetUp()
 		{
-			base.Setup();
+			base.SetUp();
 		}
 
 		[TestFixtureTearDown]
@@ -56,10 +50,16 @@ namespace UnitTests
 			base.Dispose();
 		}
 
+        [SetUp]
+        protected override void OpenServer()
+        {
+            base.OpenServer();
+        }
+
 		[TearDown]
-		protected override void ResetServer()
+		protected override void CloseServer()
 		{
-			base.ResetServer();
+			base.CloseServer();
 		}
 
 		[Test]
