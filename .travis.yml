@@ -5,21 +5,10 @@ solution: NitroDebugger.sln
 # Use the new Travis CI infrastructure
 sudo: false
 
-# Handle git submodules yourself
-git:
-    submodules: false
-
-# Use sed to replace the SSH URL with the public URL, then initialize submodules
-before_install:
-  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-  - git submodule update --init --recursive
-
 install:
-  - nuget restore libgame/libgame.sln
   - nuget restore NitroDebugger.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 
 script:
-  - xbuild libgame/libgame.sln
   - xbuild NitroDebugger.sln
   - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe NitroDebugger.UnitTests/bin/Debug/NitroDebugger.UnitTests.dll
