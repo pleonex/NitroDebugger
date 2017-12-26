@@ -40,14 +40,14 @@ namespace UnitTests
 		{
 		}
 
-		[TestFixtureSetUp]
+        [OneTimeSetUp]
 		protected override void SetUp()
 		{
 			base.SetUp();
 			manager = Client.Registers;
 		}
 
-		[TestFixtureTearDown]
+        [OneTimeTearDown]
 		protected override void Dispose()
 		{
 			base.Dispose();

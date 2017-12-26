@@ -25,11 +25,9 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace NitroDebugger.RSP
 {
@@ -42,40 +40,41 @@ namespace NitroDebugger.RSP
 		private NetworkStream stream;
 		private Queue<byte> buffer;
 
-		public Session(string hostname, int port)
-		{
-			this.client = new TcpClient(hostname, port);
-			this.stream = this.client.GetStream();
-			this.buffer = new Queue<byte>();
-		}
+        public Session(string hostname, int port)
+        {
+            this.client = new TcpClient(hostname, port);
+			this.client.NoDelay = true;
+            this.stream = this.client.GetStream();
+            this.buffer = new Queue<byte>();
+        }
 
-		public bool IsConnected {
-			get {
-				return !(client.Client.Poll(1, SelectMode.SelectRead) && client.Available == 0);
-			}
-		}
+        public bool IsConnected {
+            get {
+                return !(client.Client.Poll(1, SelectMode.SelectRead) && client.Available == 0);
+            }
+        }
 
-		public CancellationToken Cancellation {
-			get;
-			set;
-		}
+        public CancellationToken Cancellation {
+            get;
+            set;
+        }
 
-		public void Close()
-		{
-			if (this.IsConnected)
-				this.client.Close();
-		}
+        public void Close()
+        {
+            if (this.IsConnected)
+                this.client.Close();
+        }
 
-		public void Write(byte data)
-		{
-			if (!this.IsConnected)
-				throw new SocketException();
+        public void Write(byte data)
+        {
+            if (!this.IsConnected)
+                throw new SocketException();
 
-			this.stream.WriteByte(data);
-		}
+            this.stream.WriteByte(data);
+        }
 
-		public void Write(byte[] data)
-		{
+        public void Write(byte[] data)
+        {
 			if (!this.IsConnected)
 				throw new SocketException();
 
@@ -108,6 +107,15 @@ namespace NitroDebugger.RSP
 			return this.GetPacket(separator);
 		}
 
+        public void CleanReceiveBuffer()
+        {
+            this.buffer.Clear();
+            while (this.stream.DataAvailable) {
+                SetQuickAck();
+                this.stream.ReadByte();
+            }
+        }
+
 		private byte[] GetPacket(byte separator)
 		{
 			List<byte> packet = new List<byte>(5);
@@ -123,11 +131,23 @@ namespace NitroDebugger.RSP
 		{
 			byte[] buffer = new byte[1024];
 			while (this.stream.DataAvailable) {
+                SetQuickAck();
 				int read = this.stream.Read(buffer, 0, buffer.Length);;
 				for (int i = 0; i < read; i++)
 					this.buffer.Enqueue(buffer[i]);
 			}
 		}
+
+        unsafe void SetQuickAck()
+        {
+            int on = 1;
+            const int IPPROTO_TCP = 6;
+            const int TCP_QUICKACK = 12;
+            setsockopt(client.Client.Handle, IPPROTO_TCP, TCP_QUICKACK, (byte *)&on, sizeof(int));
+        }
+
+        [DllImport("libc")]
+        static extern unsafe int setsockopt(IntPtr socket, int level, int optname, byte* val, int optLen);
 	}
 }
 

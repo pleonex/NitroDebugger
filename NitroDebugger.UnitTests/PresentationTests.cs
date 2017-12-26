@@ -44,7 +44,7 @@ namespace UnitTests
 		private TcpClient connection;
 		private Presentation presentation;
 
-		[TestFixtureSetUp]
+        [OneTimeSetUp]
 		public void CreateServer()
 		{
 			server = new TcpListener(IPAddress.Loopback, 10103);
@@ -54,7 +54,7 @@ namespace UnitTests
 			connection = server.AcceptTcpClient();
 		}
 
-		[TestFixtureTearDown]
+        [OneTimeTearDown]
 		public void StopServer()
 		{
 			presentation.Close();

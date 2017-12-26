@@ -35,7 +35,7 @@ namespace NitroDebugger.Plugins
 	public abstract class StructPanel<T> : VisualPlugin
 		where T : DataStructure, new()
 	{
-		VBox container;
+		readonly VBox container;
 
 		protected StructPanel()
 		{

@@ -38,7 +38,22 @@ namespace NitroDebugger.RSP
 				return new OkReply();
 
 			if (data.Length == 3 && data[0] == 'S')
-				return new StopSignalReply(Convert.ToInt32(data.Substring(1), 16));
+				return new StopSignalReply(Convert.ToInt32(data.Substring(1), 16), null);
+
+            if (data.Length > 3 && data[0] == 'T') {
+                int signal = Convert.ToInt32(data.Substring(1, 2), 16);
+                List<Tuple<byte, uint>> regs = new List<Tuple<byte, uint>>();
+                foreach (string reg in data.Substring(3).Split(';')) {
+                    if (string.IsNullOrEmpty(reg))
+                        continue;
+                    
+                    string[] fields = reg.Split(':');
+                    byte num = Convert.ToByte(fields[0], 16);
+                    uint val = Convert.ToUInt32(fields[1], 16);
+                    regs.Add(new Tuple<byte, uint>(num, val));
+                }
+                return new StopSignalReply(signal, regs.ToArray());
+            }
 
 			if (data.Length == 3 && data[0] == 'E')
 				return new ErrorReply(Convert.ToInt32(data.Substring(1), 16));

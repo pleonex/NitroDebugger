@@ -56,6 +56,9 @@ namespace NitroDebugger.RSP
 
 		public void SendCommand(CommandPacket command)
 		{
+            // Clean buffer to avoid misunderstanding an ACK
+            this.session.CleanReceiveBuffer();
+
 			this.lastCommandSent = command;
 			this.SendData(PacketBinConverter.ToBinary(command));
 		}
@@ -77,7 +80,7 @@ namespace NitroDebugger.RSP
 
 		public ReplyPacket SendInterrupt()
 		{
-			this.SendData(new byte[] { RawPacket.Interrupt });
+			this.session.Write(new byte[] { RawPacket.Interrupt });
 			return this.ReceiveReply();
 		}
 

@@ -63,8 +63,8 @@ namespace NitroDebugger.RSP
 			// Compare checksum
 			string receivedChecksum = packet.Substring(packet.Length - 2, 2);
 			uint calculatedChecksum = Checksum.Calculate(packetData);
-			if (receivedChecksum != calculatedChecksum.ToString("x2"))
-				throw new FormatException("[BIN] Invalid checksum");
+			//if (receivedChecksum != calculatedChecksum.ToString("x2"))
+			//	throw new FormatException("[BIN] Invalid checksum");
 
 			return ReplyPacketFactory.CreateReplyPacket(packetData, commandSent);
 		}

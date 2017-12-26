@@ -33,7 +33,7 @@ namespace NitroDebugger.Plugins
 	[TypeExtensionPoint]
 	public abstract class Plugin : IDisposable
 	{
-		static List<Plugin> instances = new List<Plugin>();
+		readonly static List<Plugin> instances = new List<Plugin>();
 
 		protected Plugin()
 		{
@@ -42,7 +42,7 @@ namespace NitroDebugger.Plugins
 
 		~Plugin()
 		{
-			this.Dispose(false);
+			Dispose(false);
 		}
 
 		public static ReadOnlyCollection<Plugin> Instances {
@@ -51,7 +51,7 @@ namespace NitroDebugger.Plugins
 
 		public void Dispose()
 		{
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 

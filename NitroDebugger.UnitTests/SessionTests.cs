@@ -41,14 +41,14 @@ namespace UnitTests
 
 		private TcpListener server;
 
-		[TestFixtureSetUp]
+        [OneTimeSetUp]
 		public void CreateServer()
 		{
 			server = new TcpListener(IPAddress.Loopback, DefaultPort);
 			server.Start();
 		}
 
-		[TestFixtureTearDown]
+        [OneTimeTearDown]
 		public void StopServer()
 		{
 			server.Stop();

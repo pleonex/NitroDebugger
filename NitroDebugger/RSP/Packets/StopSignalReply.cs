@@ -30,10 +30,16 @@ namespace NitroDebugger.RSP.Packets
 {
 	public class StopSignalReply : ReplyPacket
 	{
-		public StopSignalReply(int signal)
+		public StopSignalReply(int signal, Tuple<byte, uint>[] registers = null)
 		{
 			this.Signal = ((TargetSignals)signal).ToStopSignal();
+            this.Registers = registers;
 		}
+
+        public Tuple<byte, uint>[] Registers {
+            get;
+            private set;
+        }
 
 		public StopSignal Signal {
 			get;

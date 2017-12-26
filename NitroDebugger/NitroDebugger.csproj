@@ -21,6 +21,7 @@
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
@@ -30,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -38,7 +40,12 @@
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Addins">
-      <HintPath>..\packages\Mono.Addins.1.2\lib\net40\Mono.Addins.dll</HintPath>
+      <HintPath>..\packages\Mono.Addins.1.3.7\lib\net45\Mono.Addins.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Gee.External.Capstone">
+      <HintPath>..\packages\Gee.External.Capstone.1.2.2\lib\net45\Gee.External.Capstone.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -88,5 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Gee.External.Capstone.Proxy.dll" />
+    <None Include="capstone.dll" />
   </ItemGroup>
 </Project>
