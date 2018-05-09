@@ -4,3 +4,5 @@
 *.userprefs
 packages/
 *.cache
+*.csproj.user
+*.dll
