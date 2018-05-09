@@ -58,8 +58,6 @@ namespace NitroDebugger.RSP
 				return false;
 
             StopSignalReply stopResponse = response as StopSignalReply;
-            foreach (var regs in stopResponse.Registers)
-                Console.WriteLine("{0} -> 0x{1:X8}", (RegisterType)regs.Item1, regs.Item2);
 
 			return ((StopSignalReply)response).Signal.HasFlag(StopSignal.HostBreak);
 		}

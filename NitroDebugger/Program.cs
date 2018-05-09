@@ -32,10 +32,10 @@ using Gee.External.Capstone;
 
 namespace NitroDebugger
 {
-	public static class MainClass
-	{
-		public static void Main(string[] args)
-		{
+    public static class MainClass
+    {
+        public static void Main(string[] args)
+        {
 			Console.WriteLine("/*");
 			Console.WriteLine("**************************");
 			Console.WriteLine("**     NitroDebugger    **");
@@ -58,9 +58,10 @@ namespace NitroDebugger
             var disassembler = CapstoneDisassembler.CreateArmDisassembler(DisassembleMode.Arm32);
 
 			// Start the interactive console
-			bool finish = false;
-			do {
-				Console.Write("(gdb) "); 	string cmd = Console.ReadLine();
+            bool finish = false;
+            do {
+				Console.Write("(gdb) ");
+				string cmd = Console.ReadLine();
 
 				switch (cmd) {
 				case "quit":
@@ -77,26 +78,33 @@ namespace NitroDebugger
 					break;
 
 				case "c":
+                case "cont":
+                case "continue":
 					client.Execution.Continue();
 					break;
 
-                    case "s":
-                        client.Execution.StepInto();
-                        break;
+                case "s":
+                case "step":
+                   client.Execution.StepInto();
+                    break;
 
-                    case "a":
-                        uint pc = client.Registers.GetRegister(RegisterType.PC).Value;
-                        Console.WriteLine("PC: {0:X8}", pc);
-                        byte[] data = client.Stream.Read(pc, 0x10);
-                        foreach (var inst in disassembler.DisassembleAll(data))
-                            Console.WriteLine("{0}\t{1}", inst.Mnemonic, inst.Operand);
-                        break;
+                case "d":
+                case "dis":
+                    uint pc = client.Registers.GetRegister(RegisterType.PC).Value;
+                    byte[] data = client.Stream.Read(pc - 0x10, 0x20);
+                    foreach (var inst in disassembler.DisassembleAll(data, pc)) {
+                        Console.WriteLine("{0:X8}h\t{1}\t{2}",
+                            inst.Address,
+                            inst.Mnemonic,
+                            inst.Operand);
+                    }
+                    break;
 
-				case "b":
+				case "halt":
                         client.Execution.Stop();
 					break;
 
-				case "f":
+				case "dump3dsRAM":
                         const uint start = 0x08000000;
                         const uint length = 0x08000000;
                         const int blockSize = 1024;
@@ -106,21 +114,24 @@ namespace NitroDebugger
                         using (var fs = new BinaryWriter(new FileStream("dump.bin", FileMode.Create))) {
                             client.Stream.Seek(start, SeekOrigin.Begin);
                             for (uint i = 0; i < length; i += blockSize) {
-                                if (i % (blockSize * 4096) == 0)
-                                    Console.Write("\r{0:F2}%", i * 100.0 / length);
-                                fs.Write(client.Stream.Read(start + i, blockSize));
+                                Console.WriteLine("{0:F2}%", i * 100.0 / length);
+                                byte[] dumpData = client.Stream.Read(start + i, blockSize);
+                                Console.WriteLine("Received {0} bytes from {1:X8}",
+                                    dumpData.Length, start + i);
+                                fs.Write(dumpData);
                             }
                         }
                         Console.WriteLine();
 					break;
 
-                    case "m":
-                        Console.Write("Address: ");
-                        uint addr = Convert.ToUInt32(Console.ReadLine(), 16);
+                case "m":
+                case "memory":
+                    Console.Write("Address: ");
+                    uint addr = Convert.ToUInt32(Console.ReadLine(), 16);
 
-                        Console.WriteLine("Memory: ");
-                        Console.WriteLine(BitConverter.ToString(client.Stream.Read(addr, 0x10)));
-                        break;
+                    Console.WriteLine("Memory: ");
+                    Console.WriteLine(BitConverter.ToString(client.Stream.Read(addr, 0x10)));
+                    break;
 
 				default:
 					Console.WriteLine("Unknown command");
