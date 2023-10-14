@@ -56,6 +56,7 @@
     <Compile Include="RSP\TargetSignals.cs" />
     <Compile Include="RSP\Presentation.cs" />
     <Compile Include="RSP\PacketBinConverter.cs" />
+    <Compile Include="RSP\BreakpointManager.cs" />
     <Compile Include="RSP\Rle.cs" />
     <Compile Include="RSP\Checksum.cs" />
     <Compile Include="RSP\RawPacket.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="RSP\Packets\DataReply.cs" />
     <Compile Include="RSP\Packets\ErrorReply.cs" />
     <Compile Include="RSP\Packets\WriteMemoryCommand.cs" />
+    <Compile Include="RSP\Packets\ReadWatchpointCommand.cs" />
     <Compile Include="ErrorCode.cs" />
     <Compile Include="RSP\ConnectionManager.cs" />
     <Compile Include="RSP\ExecutionManager.cs" />

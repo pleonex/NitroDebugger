@@ -48,14 +48,24 @@ namespace NitroDebugger
 			Console.WriteLine("*/");
 			Console.WriteLine();
 
+            var disassembler = CapstoneDisassembler.CreateArmDisassembler(DisassembleMode.Arm32);
+
 			// Create session
 			Console.Write("Hostname: "); 	string hostname = Console.ReadLine();
 			Console.Write("Port: ");		int port = Convert.ToInt32(Console.ReadLine());
 			Console.WriteLine();
 			GdbClient client = new GdbClient();
 			client.Connection.Connect(hostname, port);
-
-            var disassembler = CapstoneDisassembler.CreateArmDisassembler(DisassembleMode.Arm32);
+            client.Execution.BreakExecution += delegate {
+                    uint pc = client.Registers.GetRegister(RegisterType.PC).Value;
+                    byte[] data = client.Stream.Read(pc - 0x10, 0x20);
+                    foreach (var inst in disassembler.DisassembleAll(data, pc - 0x10)) {
+                        Console.WriteLine("{0:X8}h\t{1}\t{2}",
+                            inst.Address,
+                            inst.Mnemonic,
+                            inst.Operand);
+                    }
+            };
 
 			// Start the interactive console
             bool finish = false;
@@ -92,7 +102,23 @@ namespace NitroDebugger
                 case "dis":
                     uint pc = client.Registers.GetRegister(RegisterType.PC).Value;
                     byte[] data = client.Stream.Read(pc - 0x10, 0x20);
-                    foreach (var inst in disassembler.DisassembleAll(data, pc)) {
+                    foreach (var inst in disassembler.DisassembleAll(data, pc - 0x10)) {
+                        Console.WriteLine("{0:X8}h\t{1}\t{2}",
+                            inst.Address,
+                            inst.Mnemonic,
+                            inst.Operand);
+                    }
+                    break;
+
+                case "dism":
+                    Console.Write("Address: ");
+                    uint disAddr = Convert.ToUInt32(Console.ReadLine(), 16);
+
+                    Console.Write("Size: ");
+                    int disSize = Convert.ToInt32(Console.ReadLine(), 16);
+
+                    byte[] disData = client.Stream.Read(disAddr, disSize);
+                    foreach (var inst in disassembler.DisassembleAll(disData, disAddr)) {
                         Console.WriteLine("{0:X8}h\t{1}\t{2}",
                             inst.Address,
                             inst.Mnemonic,
@@ -104,6 +130,23 @@ namespace NitroDebugger
                         client.Execution.Stop();
 					break;
 
+                case "b":
+                        Console.Write("Address: ");
+                        uint bAddr = Convert.ToUInt32(Console.ReadLine(), 16);
+
+                        Console.Write("Size: ");
+                        int bSize = Convert.ToInt32(Console.ReadLine(), 16);
+
+                        client.Breakpoints.SetBreakpointRead(bAddr, bSize);
+                        break;
+
+                case "r":
+                        Console.WriteLine("Registers:");
+                        foreach (var reg in client.Registers.GetRegisters()) {
+                            Console.WriteLine($"  {reg.Type}:{reg.Value:X8}");
+                        }
+                        break;
+
 				case "dump3dsRAM":
                         const uint start = 0x08000000;
                         const uint length = 0x08000000;
@@ -114,11 +157,9 @@ namespace NitroDebugger
                         using (var fs = new BinaryWriter(new FileStream("dump.bin", FileMode.Create))) {
                             client.Stream.Seek(start, SeekOrigin.Begin);
                             for (uint i = 0; i < length; i += blockSize) {
-                                Console.WriteLine("{0:F2}%", i * 100.0 / length);
-                                byte[] dumpData = client.Stream.Read(start + i, blockSize);
-                                Console.WriteLine("Received {0} bytes from {1:X8}",
-                                    dumpData.Length, start + i);
-                                fs.Write(dumpData);
+                                if (i % 4096 == 0)
+                                    Console.Write("\r{0:F2}%", i * 100.0 / length);
+                                fs.Write(client.Stream.Read(start + i, blockSize));
                             }
                         }
                         Console.WriteLine();

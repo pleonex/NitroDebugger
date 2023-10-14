@@ -46,8 +46,12 @@ namespace NitroDebugger.RSP
                 foreach (string reg in data.Substring(3).Split(';')) {
                     if (string.IsNullOrEmpty(reg))
                         continue;
-                    
+
                     string[] fields = reg.Split(':');
+                    if (fields[0] == "thread") {
+                        Console.WriteLine("Thread: " + fields[1]);
+                        continue;
+                    }
                     byte num = Convert.ToByte(fields[0], 16);
                     uint val = Convert.ToUInt32(fields[1], 16);
                     regs.Add(new Tuple<byte, uint>(num, val));

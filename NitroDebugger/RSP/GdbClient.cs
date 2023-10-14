@@ -50,6 +50,7 @@ namespace NitroDebugger.RSP
 			this.Execution = new ExecutionManager(this);
 			this.Stream = new GdbStream(this);
 			this.Registers = new RegisterManager(this);
+            this.Breakpoints = new BreakpointManager(this);
 		}
 
 		public ConnectionManager Connection {
@@ -71,6 +72,11 @@ namespace NitroDebugger.RSP
 			get;
 			private set;
 		}
+
+        public BreakpointManager Breakpoints {
+            get;
+            private set;
+        }
 
 		public ErrorCode Error {
 			get;
